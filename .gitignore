@@ -348,3 +348,7 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+
+mod_depthaicore/msvc64
+mod_depthaicore/cached_module_json.cmake
