@@ -24,6 +24,10 @@ namespace nap
 
 	void DepthAiCoreService::update(double deltaTime)
 	{
+		std::cout << "updating" << std::endl;
+		for (auto* mO : mOakFrames) {
+			mO->update(deltaTime);
+		}
 	}
 	
 
@@ -38,7 +42,23 @@ namespace nap
 	{
 	}
 
-	void DepthAiCoreService::initFrame() {
-		OakFrame = std::make_unique < OakFrameRender >();
+	void DepthAiCoreService::registerObjectCreators(rtti::Factory& factory)
+	{
+		factory.addObjectCreator(std::make_unique<OakFrameRenderObjectCreator>(*this));
+	}
+
+	void DepthAiCoreService::registerOakFrame(nap::OakFrameRender& nFrame)
+	{
+		mOakFrames.emplace_back(&nFrame);
+	}
+
+	void DepthAiCoreService::removeOakFrameRender(nap::OakFrameRender& nFrame)
+	{
+		auto found_it = std::find_if(mOakFrames.begin(), mOakFrames.end(), [&](const auto& it)
+			{
+				return it == &nFrame;
+			});
+		assert(found_it != mOakFrames.end());
+		mOakFrames.erase(found_it);
 	}
 }

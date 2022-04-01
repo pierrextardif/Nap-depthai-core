@@ -1,14 +1,18 @@
 #pragma once
 
+#include <oakframerender.h>
+
 // External Includes
 #include <nap/service.h>
 
-#include <OakFrameRender.h>
+
+using namespace nap;
 
 namespace nap
 {
 	class NAPAPI DepthAiCoreService : public Service
 	{
+		friend class OakFrameRender;
 		RTTI_ENABLE(Service)
 	public:
 		// Default Constructor
@@ -43,12 +47,24 @@ namespace nap
 		 * When service B depends on A, Service B is shutdown before A
 		 */
 		virtual void shutdown() override;
+		/**
+		* Registers a frame renderer with the service
+		*/
+		void registerOakFrame(nap::OakFrameRender& nFrame);
 
-		void initFrame();
+		/**
+		* Removes a frame renderer from the service
+		*/
+		void removeOakFrameRender(nap::OakFrameRender& nFrame);
+
+
+	protected:
+		virtual void registerObjectCreators(rtti::Factory& factory) override;
+
 
 	private:
 		
-		std::unique_ptr< OakFrameRender > OakFrame;
+		std::vector< nap::OakFrameRender* > mOakFrames;
 
 	};
 }
