@@ -2,57 +2,67 @@
 #include "depthaicoreservice.h"
 
 // External Includes
-#include <sceneservice.h>
-#include <renderservice.h>
 #include <nap/core.h>
 #include <nap/resourcemanager.h>
 #include <nap/logger.h>
 #include <iostream>
 
-RTTI_BEGIN_CLASS_NO_DEFAULT_CONSTRUCTOR(nap::DepthAiCoreService)
+RTTI_BEGIN_CLASS_NO_DEFAULT_CONSTRUCTOR(nap::DepthAICoreService)
 	RTTI_CONSTRUCTOR(nap::ServiceConfiguration*)
 RTTI_END_CLASS
 
 namespace nap
 {
-	bool DepthAiCoreService::init(nap::utility::ErrorState& errorState)
+	bool DepthAICoreService::init(nap::utility::ErrorState& errorState)
 	{
-		//Logger::info("Initializing DepthAiCoreService");
+		//Logger::info("Initializing DepthAICoreService");
 		return true;
 	}
 
 
-	void DepthAiCoreService::update(double deltaTime)
+	void DepthAICoreService::update(double deltaTime)
 	{
-		std::cout << "updating" << std::endl;
 		for (auto* mO : mOakFrames) {
 			mO->update(deltaTime);
 		}
 	}
 	
+	void DepthAICoreService::initOak() {
+		
+		for (auto* mO : mOakFrames) {
+			mO->init();
+		}
+	}
 
-	void DepthAiCoreService::getDependentServices(std::vector<rtti::TypeInfo>& dependencies)
+	void DepthAICoreService::getDependentServices(std::vector<rtti::TypeInfo>& dependencies)
 	{
-		dependencies.emplace_back(RTTI_OF(SceneService));
-		dependencies.emplace_back(RTTI_OF(RenderService));
 	}
 	
 
-	void DepthAiCoreService::shutdown()
+	void DepthAICoreService::shutdown()
 	{
 	}
 
-	void DepthAiCoreService::registerObjectCreators(rtti::Factory& factory)
+
+	glm::vec2 DepthAICoreService::getSizeFrame()
+	{
+
+		return mOakFrames.size() > 0 ? mOakFrames[0]->getOakFrameSize() : glm::vec2(1920, 1080);
+	}
+
+
+
+	void DepthAICoreService::registerObjectCreators(rtti::Factory& factory)
 	{
 		factory.addObjectCreator(std::make_unique<OakFrameRenderObjectCreator>(*this));
 	}
 
-	void DepthAiCoreService::registerOakFrame(nap::OakFrameRender& nFrame)
+	void DepthAICoreService::registerOakFrame(nap::OakFrameRender& nFrame)
 	{
 		mOakFrames.emplace_back(&nFrame);
 	}
 
-	void DepthAiCoreService::removeOakFrameRender(nap::OakFrameRender& nFrame)
+	void DepthAICoreService::removeOakFrameRender(nap::OakFrameRender& nFrame)
 	{
 		auto found_it = std::find_if(mOakFrames.begin(), mOakFrames.end(), [&](const auto& it)
 			{

@@ -14,7 +14,7 @@ using namespace nap;
 
 namespace nap
 {
-	class DepthAiCoreService;
+	class DepthAICoreService;
 
 
 	enum class DAINodeType : int
@@ -42,12 +42,12 @@ namespace nap
 	class NAPAPI OakFrameRender : public Device
 	{
 		RTTI_ENABLE(Device)    
-		friend class DepthAiCoreService;
+		friend class DepthAICoreService;
 
 		
 	public :
 		
-		OakFrameRender(DepthAiCoreService& service);
+		OakFrameRender(DepthAICoreService& service);
 		virtual bool start(utility::ErrorState& errorState) override;
 		virtual void stop() override;
 
@@ -57,32 +57,51 @@ namespace nap
 		//DAIIputOutput type = DAIIputOutput::InputLink;
 		DAINodeType nodeType;
 
+		Texture2D& getRGBATexture();
 		Texture2D& getYTexture();
 		Texture2D& getUTexture();
 		Texture2D& getVTexture();
 
+		bool textureInit();
+
+		glm::vec2 getOakFrameSize();
+
 
 	private :
 
-		DepthAiCoreService& mService;
+		DepthAICoreService& mService;
 		dai::Pipeline pipeline;
 
-		dai::DeviceBase* internalDevice;
+		dai::Device* device;
 
 		void updateOakFrame();
 		bool init();
 
+		bool initTexture(std::shared_ptr < dai::ImgFrame > imgFrame);
+
 		std::unique_ptr<Texture2D> texY;
 		std::unique_ptr<Texture2D> texU;
 		std::unique_ptr<Texture2D> texV;
+		std::unique_ptr<Texture2D> texRGBA;
+		SurfaceDescriptor rgbaSurfaceDescriptor;
 
 		std::shared_ptr<dai::DataOutputQueue> video = nullptr;
 
+		void clearTextures();
+
 		bool texturesCreated;
+		glm::vec2 frameSize;
+		int pitch;
+
+		uint8_t* tmpBuffer;
+
+		// helper
+		std::vector<uint8_t> createUVTexture(bool vTex);
+		void checkCvMatType(cv::Mat texColor);
 
 	};
 
-	using OakFrameRenderObjectCreator = rtti::ObjectCreator<OakFrameRender, DepthAiCoreService>;
+	using OakFrameRenderObjectCreator = rtti::ObjectCreator<OakFrameRender, DepthAICoreService>;
 	
 }
 

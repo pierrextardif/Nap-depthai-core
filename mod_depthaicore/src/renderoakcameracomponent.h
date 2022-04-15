@@ -1,7 +1,6 @@
 #pragma once
 
 // External Includes
-#include <component.h>
 #include <rendercomponent.h>
 #include <nap/resourceptr.h>
 #include <rendertexture2d.h>
@@ -45,7 +44,7 @@ namespace nap
 			return mOakFrame;
 		}
 
-		void setContentSampler();
+		bool setContentSampler();
 		void draw();
 
 		nap::Texture2D& getOutputTexture() {
@@ -65,11 +64,15 @@ namespace nap
 		UniformMat4Instance*		mProjectMatrixUniform = nullptr;				///< Projection matrix uniform in the material
 		UniformMat4Instance*		mViewMatrixUniform = nullptr;					///< View matrix uniform in the material
 		UniformStructInstance*		mMVPStruct = nullptr;							///< model view projection struct
+		Sampler2DInstance*			mRGBASampler = nullptr;							///< Video material Y sampler
 		Sampler2DInstance*			mYSampler = nullptr;							///< Video material Y sampler
 		Sampler2DInstance*			mUSampler = nullptr;							///< Video material U sampler
 		Sampler2DInstance*			mVSampler = nullptr;							///< Video material V sampler
 		glm::mat4x4					mModelMatrix;									///< Computed model matrix, used to scale plane to fit target bounds
 		bool						mDirty = true;	
+
+
+		bool hasBeenSet = false;
 		/**
 		 * Checks if the uniform is available on the source material and creates it if so
 		 * @return the uniform, nullptr if not available.

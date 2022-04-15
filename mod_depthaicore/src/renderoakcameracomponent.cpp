@@ -1,7 +1,7 @@
 
 // Local Includes
 #include "renderoakcameracomponent.h"
-#include "camerashader.h"
+#include "oakshader.h"
 
 // External Includes
 #include <entity.h>
@@ -68,7 +68,7 @@ namespace nap
 		mPlane.mSize = glm::vec2(1.0f, 1.0f);
 		mPlane.mPosition = glm::vec3(0.0f, 0.0f, 0.0f);
 		mPlane.mCullMode = ECullMode::Back;
-		mPlane.mUsage = EMeshDataUsage::Static;
+		mPlane.mUsage = EMemoryUsage::Static;
 		mPlane.mColumns = 1;
 		mPlane.mRows = 1;
 
@@ -81,16 +81,16 @@ namespace nap
 
 
 		// Get video material
-		Material* video_material = mRenderService->getOrCreateMaterial<CameraShader>(errorState);
-		if (!errorState.check(video_material != nullptr, "%s: unable to get or create video material", resource->mID.c_str()))
+		Material* oakMaterial = mRenderService->getOrCreateMaterial<OakShader>(errorState);
+		if (!errorState.check(oakMaterial != nullptr, "%s: unable to get or create video material", resource->mID.c_str()))
 			return false;
 
 		// Create resource for the video material instance
 		mMaterialInstanceResource.mBlendMode = EBlendMode::Opaque;
 		mMaterialInstanceResource.mDepthMode = EDepthMode::NoReadWrite;
-		mMaterialInstanceResource.mMaterial = video_material;
+		mMaterialInstanceResource.mMaterial = oakMaterial;
 
-		// Initialize video material instance, used for rendering video
+		// Initialize oak material instance, used for rendering video
 		if (!mMaterialInstance.init(*mRenderService, mMaterialInstanceResource, errorState))
 			return false;
 
@@ -109,16 +109,15 @@ namespace nap
 			return false;
 
 		// Get sampler inputs to update from video material
-		mYSampler = ensureSampler(uniform::video::YSampler, errorState);
-		mUSampler = ensureSampler(uniform::video::USampler, errorState);
-		mVSampler = ensureSampler(uniform::video::VSampler, errorState);
+		mRGBASampler = ensureSampler(uniform::video::RGBASampler, errorState);
+		//mUSampler = ensureSampler(uniform::video::USampler, errorState);
+		//mVSampler = ensureSampler(uniform::video::VSampler, errorState);
 
 
 		// Create the renderable mesh, which represents a valid mesh / material combination
 		mRenderableMesh = mRenderService->createRenderableMesh(mPlane, mMaterialInstance, errorState);
 		if (!mRenderableMesh.isValid())
 			return false;
-
 
 
 
@@ -134,6 +133,38 @@ namespace nap
 
 	void RenderOakCameraComponentInstance::onDraw(IRenderTarget& renderTarget, VkCommandBuffer commandBuffer, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix)
 	{
+		// Update the model matrix so that the plane mesh is of the same size as the render target
+		computeModelMatrix(renderTarget, mModelMatrix);
+		mModelMatrixUniform->setValue(mModelMatrix);
+
+		// Update matrices, projection and model are required
+		mProjectMatrixUniform->setValue(projectionMatrix);
+		mViewMatrixUniform->setValue(viewMatrix);
+
+		// Get valid descriptor set
+		const DescriptorSet& descriptor_set = mMaterialInstance.update();
+
+		// Gather draw info
+		MeshInstance& mesh_instance = mRenderableMesh.getMesh().getMeshInstance();
+		GPUMesh& mesh = mesh_instance.getGPUMesh();
+
+		// Get pipeline to to render with
+		utility::ErrorState error_state;
+		RenderService::Pipeline pipeline = mRenderService->getOrCreatePipeline(renderTarget, mRenderableMesh.getMesh(), mMaterialInstance, error_state);
+		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.mPipeline);
+		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.mLayout, 0, 1, &descriptor_set.mSet, 0, nullptr);
+
+		// Bind buffers and draw
+		const std::vector<VkBuffer>& vertexBuffers = mRenderableMesh.getVertexBuffers();
+		const std::vector<VkDeviceSize>& vertexBufferOffsets = mRenderableMesh.getVertexBufferOffsets();
+
+		vkCmdBindVertexBuffers(commandBuffer, 0, vertexBuffers.size(), vertexBuffers.data(), vertexBufferOffsets.data());
+		for (int index = 0; index < mesh_instance.getNumShapes(); ++index)
+		{
+			const IndexBuffer& index_buffer = mesh.getIndexBuffer(index);
+			vkCmdBindIndexBuffer(commandBuffer, index_buffer.getBuffer(), 0, VK_INDEX_TYPE_UINT32);
+			vkCmdDrawIndexed(commandBuffer, index_buffer.getCount(), 1, 0, 0, 0);
+		}
 	}
 
 
@@ -183,6 +214,10 @@ namespace nap
 		// Create projection matrix
 		glm::mat4 proj_matrix = OrthoCameraComponentInstance::createRenderProjectionMatrix(0.0f, (float)size.x, 0.0f, (float)size.y);
 
+
+		if (!hasBeenSet)
+			hasBeenSet = setContentSampler();
+
 		// Call on draw
 		mTarget.beginRendering();
 		onDraw(mTarget, command_buffer, glm::mat4(), proj_matrix);
@@ -192,17 +227,22 @@ namespace nap
 
 
 
-	void RenderOakCameraComponentInstance::setContentSampler()
+	bool RenderOakCameraComponentInstance::setContentSampler()
 	{
 
 
 		if (mOakFrame != nullptr) {
 
-			mYSampler->setTexture(mOakFrame->getYTexture());
-			mUSampler->setTexture(mOakFrame->getUTexture());
-			mVSampler->setTexture(mOakFrame->getVTexture());
+			if (mOakFrame->textureInit()) {
+				mRGBASampler->setTexture(mOakFrame->getRGBATexture());
+				return true;
+			}
+			else {
+				return false;
+			}
 
 		}
+		return false;
 	}
 
 

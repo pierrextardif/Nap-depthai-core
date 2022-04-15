@@ -3,6 +3,9 @@
     "mID": "ModuleInfo", 
     "RequiredModules": [
         "mod_naprender"
-    ], 
-    "WindowsDllSearchPaths": []
+    ],
+    "WindowsDllSearchPaths": [
+        "C:/dev/opencv/opencv/build/x64/vc15/bin",
+        "C:/dev/opencv/opencv/build/bin"
+    ]
 }

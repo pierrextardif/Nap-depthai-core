@@ -10,13 +10,13 @@ using namespace nap;
 
 namespace nap
 {
-	class NAPAPI DepthAiCoreService : public Service
+	class NAPAPI DepthAICoreService : public Service
 	{
 		friend class OakFrameRender;
 		RTTI_ENABLE(Service)
 	public:
 		// Default Constructor
-		DepthAiCoreService(ServiceConfiguration* configuration) : Service(configuration)	{ }
+		DepthAICoreService(ServiceConfiguration* configuration) : Service(configuration) { }
 
 		/**
 		 * Use this call to register service dependencies
@@ -25,14 +25,16 @@ namespace nap
 		 * @param dependencies rtti information of the services this service depends on
 		 */
 		virtual void getDependentServices(std::vector<rtti::TypeInfo>& dependencies) override;
-		
+
 		/**
 		 * Initializes the service
 		 * @param errorState contains the error message on failure
 		 * @return if the video service was initialized correctly
 		 */
 		virtual bool init(nap::utility::ErrorState& errorState) override;
-		
+
+
+		void initOak();
 		/**
 		 * Invoked by core in the app loop. Update order depends on service dependency
 		 * This call is invoked after the resource manager has loaded any file changes but before
@@ -40,7 +42,7 @@ namespace nap
 		 * @param deltaTime: the time in seconds between calls
 		*/
 		virtual void update(double deltaTime) override;
-		
+
 		/**
 		 * Invoked when exiting the main loop, after app shutdown is called
 		 * Use this function to close service specific handles, drivers or devices
@@ -57,13 +59,15 @@ namespace nap
 		*/
 		void removeOakFrameRender(nap::OakFrameRender& nFrame);
 
+		glm::vec2 getSizeFrame();
+
 
 	protected:
 		virtual void registerObjectCreators(rtti::Factory& factory) override;
 
 
 	private:
-		
+
 		std::vector< nap::OakFrameRender* > mOakFrames;
 
 	};
