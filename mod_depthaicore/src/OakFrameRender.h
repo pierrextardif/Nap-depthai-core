@@ -58,9 +58,6 @@ namespace nap
 		DAINodeType nodeType;
 
 		Texture2D& getRGBATexture();
-		Texture2D& getYTexture();
-		Texture2D& getUTexture();
-		Texture2D& getVTexture();
 
 		bool textureInit();
 
@@ -79,15 +76,12 @@ namespace nap
 
 		bool initTexture(std::shared_ptr < dai::ImgFrame > imgFrame);
 
-		std::unique_ptr<Texture2D> texY;
-		std::unique_ptr<Texture2D> texU;
-		std::unique_ptr<Texture2D> texV;
 		std::unique_ptr<Texture2D> texRGBA;
 		SurfaceDescriptor rgbaSurfaceDescriptor;
 
 		std::shared_ptr<dai::DataOutputQueue> video = nullptr;
 
-		void clearTextures();
+		void clearTexture();
 
 		bool texturesCreated;
 		glm::vec2 frameSize;

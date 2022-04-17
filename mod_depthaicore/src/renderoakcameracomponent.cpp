@@ -109,9 +109,10 @@ namespace nap
 			return false;
 
 		// Get sampler inputs to update from video material
-		mRGBASampler = ensureSampler(uniform::video::RGBASampler, errorState);
-		//mUSampler = ensureSampler(uniform::video::USampler, errorState);
-		//mVSampler = ensureSampler(uniform::video::VSampler, errorState);
+		mRGBASampler = ensureSampler(uniform::oakVideo::RGBASampler, errorState);
+
+		if (mRGBASampler == nullptr)
+			return false;
 
 
 		// Create the renderable mesh, which represents a valid mesh / material combination
@@ -166,17 +167,7 @@ namespace nap
 			vkCmdDrawIndexed(commandBuffer, index_buffer.getCount(), 1, 0, 0, 0);
 		}
 	}
-
-
-
-
-
-
-
-
-
-
-
+	
 	UniformMat4Instance* RenderOakCameraComponentInstance::ensureUniform(const std::string& uniformName, utility::ErrorState& error)
 	{
 		assert(mMVPStruct != nullptr);
@@ -216,7 +207,7 @@ namespace nap
 
 
 		if (!hasBeenSet)
-			hasBeenSet = setContentSampler();
+			//hasBeenSet = setContentSampler();
 
 		// Call on draw
 		mTarget.beginRendering();
@@ -235,7 +226,7 @@ namespace nap
 
 			if (mOakFrame->textureInit()) {
 				mRGBASampler->setTexture(mOakFrame->getRGBATexture());
-				return true;
+				return false;
 			}
 			else {
 				return false;

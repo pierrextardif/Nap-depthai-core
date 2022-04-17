@@ -7,6 +7,9 @@
  // External Includes
 #include <shader.h>
 
+// Service include
+#include <depthaicoreservice.h>
+
 namespace nap
 {
 	// Forward declares
@@ -16,14 +19,13 @@ namespace nap
 	// Video shader sampler names 
 	namespace uniform
 	{
-		namespace video
+		namespace oakVideo
 		{
 			inline constexpr const char* RGBASampler = "colorTexture";	///< video shader RGBA sampler name
 		}
 	}
 
 	/**
-	 * Shader that converts YUV video textures, output by the nap::VideoPlayer, into an RGB image.
 	 * Used by the nap::RenderVideoComponent.
 	 */
 	class NAPAPI OakShader : public Shader
@@ -38,5 +40,8 @@ namespace nap
 		 * @return if initialization succeeded.
 		 */
 		virtual bool init(utility::ErrorState& errorState) override;
+
+	private:
+		RenderService* mRenderService = nullptr;
 	};
 }

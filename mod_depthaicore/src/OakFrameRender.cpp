@@ -73,7 +73,8 @@ namespace nap
         // Properties
         camRgb->setBoardSocket(dai::CameraBoardSocket::RGB);
         camRgb->setResolution(dai::ColorCameraProperties::SensorResolution::THE_1080_P);
-        camRgb->setVideoSize(1920, 1080);
+        camRgb->setInterleaved(false);
+        camRgb->setColorOrder(dai::ColorCameraProperties::ColorOrder::RGB);
 
         xoutVideo->input.setBlocking(false);
         xoutVideo->input.setQueueSize(1);
@@ -104,7 +105,8 @@ namespace nap
                 assert(texRGBA != nullptr);
                 //texRGBA->update(videoIn->getFrame()
 
-                cv::Mat tmpColor = videoIn->getFrame();
+                cv::Mat tmpColor = videoIn->getFrame(true);
+                //cv::imshow("rgb", tmpColor);
                 /*cv::Mat* dataMat = new cv::Mat();
                 cv::cvtColor(videoIn->getFrame(), *dataMat, cv::COLOR_RGB2RGBA, 4);*/
 
@@ -154,41 +156,7 @@ namespace nap
                 tmpBuffer = new uint8_t[sizeFrame];
 
 
-                // Create texture description
-                SurfaceDescriptor tex_description;
-                tex_description.mWidth = frameSize.x;
-                tex_description.mHeight = frameSize.y;
-                tex_description.mColorSpace = EColorSpace::Linear;
-                tex_description.mDataType = ESurfaceDataType::BYTE;
-                tex_description.mChannels = ESurfaceChannels::R;
-
-
-                // Create Y Texture
-                tex_description.mChannels = ESurfaceChannels::R;
-                texY = std::make_unique<Texture2D>(mService.getCore());
-                texY->mUsage = ETextureUsage::DynamicWrite;
-                if (!texY->init(tex_description, false, 0, error))
-                    return false;
-
-                // Update dimensions for U and V texture
-                float uv_x = frameSize.x * 0.5f;
-                float uv_y = frameSize.y * 0.5f;
-                tex_description.mWidth = uv_x;
-                tex_description.mHeight = uv_y;
-
-                // Create U
-                texU = std::make_unique<Texture2D>(mService.getCore());
-                texU->mUsage = ETextureUsage::DynamicWrite;
-                if (!texU->init(tex_description, false, 0, error))
-                    return false;
-
-                // Create V Texture
-                texV = std::make_unique<Texture2D>(mService.getCore());
-                texV->mUsage = ETextureUsage::DynamicWrite;
-                if (!texV->init(tex_description, false, 0, error))
-                    return false;
-
-                clearTextures();
+                clearTexture();
 
                 texturesCreated = true;
                 std::cout << "texture created" << std::endl;
@@ -201,7 +169,7 @@ namespace nap
     }
 
 
-    void OakFrameRender::clearTextures()
+    void OakFrameRender::clearTexture()
     {
         float vid_x = frameSize.x;
         float vid_y = frameSize.y;
@@ -220,26 +188,7 @@ namespace nap
 
 
         texRGBA->update(rgba_default_data.data(), texRGBA->getWidth(), texRGBA->getHeight(), texRGBA->getWidth() * 4, ESurfaceChannels::RGBA);
-
-        texY->update(y_default_data.data(), texY->getWidth(), texY->getHeight(), texY->getWidth(), ESurfaceChannels::R);
-        texU->update(uv_default_data.data(), texU->getWidth(), texU->getHeight(), texU->getWidth(), ESurfaceChannels::R);
-        texV->update(uv_default_data.data(), texV->getWidth(), texV->getHeight(), texV->getWidth(), ESurfaceChannels::R);
     }
-
-
-    nap::Texture2D& OakFrameRender::getYTexture()
-    {
-        NAP_ASSERT_MSG(texY != nullptr, "Missing video Y texture");
-        return *texY;
-    }
-
-
-    nap::Texture2D& OakFrameRender::getUTexture()
-    {
-        NAP_ASSERT_MSG(texU != nullptr, "Missing video U texture");
-        return *texU;
-    }
-
 
     nap::Texture2D& OakFrameRender::getRGBATexture() {
 
@@ -264,13 +213,6 @@ namespace nap
         return uv_data;
 
 
-    }
-
-
-    nap::Texture2D& OakFrameRender::getVTexture()
-    {
-        NAP_ASSERT_MSG(texV != nullptr, "Missing video V texture");
-        return *texV;
     }
 
     bool OakFrameRender::textureInit() {

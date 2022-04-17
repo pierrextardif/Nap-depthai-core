@@ -7,5 +7,8 @@
     "WindowsDllSearchPaths": [
         "C:/dev/opencv/opencv/build/x64/vc15/bin",
         "C:/dev/opencv/opencv/build/bin"
+    ],
+    "DataSearchPaths": [
+        "{ROOT}/user_modules/mod_depthaicore/data"
     ]
 }
