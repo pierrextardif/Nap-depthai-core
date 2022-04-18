@@ -112,8 +112,9 @@ namespace nap
 
 		// Get sampler inputs to update from video material
 		mRGBASampler = ensureSampler(uniform::oakVideo::RGBASampler, errorState);
+		mSemanticSegSampler = ensureSampler(uniform::oakVideo::SemanticSegSampler, errorState);
 
-		if (mRGBASampler == nullptr)
+		if (mRGBASampler == nullptr || mSemanticSegSampler == nullptr)
 			return false;
 
 
@@ -228,6 +229,7 @@ namespace nap
 
 			if (mOakFrame->textureInit()) {
 				mRGBASampler->setTexture(mOakFrame->getRGBATexture());
+				mSemanticSegSampler->setTexture(mOakFrame->getSegmentationTexture());
 				return true;
 			}
 			else {

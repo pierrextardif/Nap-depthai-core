@@ -65,6 +65,7 @@ namespace nap
 		UniformMat4Instance*		mViewMatrixUniform = nullptr;					///< View matrix uniform in the material
 		UniformStructInstance*		mMVPStruct = nullptr;							///< model view projection struct
 		Sampler2DInstance*			mRGBASampler = nullptr;							///< Video material Y sampler
+		Sampler2DInstance*			mSemanticSegSampler = nullptr;							///< Video material Y sampler
 		Sampler2DInstance*			mYSampler = nullptr;							///< Video material Y sampler
 		Sampler2DInstance*			mUSampler = nullptr;							///< Video material U sampler
 		Sampler2DInstance*			mVSampler = nullptr;							///< Video material V sampler

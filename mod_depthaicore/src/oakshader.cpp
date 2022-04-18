@@ -51,12 +51,17 @@ void main(void)
 static const char camFragShader[] = R"glslang(
 #version 450 core
 uniform sampler2D colorTexture;
+uniform sampler2D semanticSegTexture;
 in vec3 pass_Uvs;
 
 out vec4 out_Color;
 void main() 
 {
-	out_Color = vec4(texture(colorTexture,vec2(pass_Uvs.x, 1.0 - pass_Uvs.y)).rgb, 1.0);
+	vec4 originalColors = vec4(texture(colorTexture,vec2(pass_Uvs.x, 1.0 - pass_Uvs.y)).rgb, 1.0);
+	vec3 human = texture(semanticSegTexture,vec2(pass_Uvs.x, 1.0 - pass_Uvs.y)).rgb;
+
+	out_Color = vec4( human * 255., 1.0);
+
 })glslang";
 
 //texture(colorTexture, pass_Uvs.xy);

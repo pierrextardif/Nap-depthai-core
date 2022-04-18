@@ -4,36 +4,43 @@
 
 #pragma once
 
- // External Includes
+// External Includes
 #include <shader.h>
-
-// Service include
-#include <oakframerender.h>
 
 namespace nap
 {
 	// Forward declares
 	class Core;
-	class Material;
+	class RenderService;
 
 	// Video shader sampler names 
 	namespace uniform
 	{
-		namespace oakVideo
+		namespace video
 		{
-			inline constexpr const char* RGBASampler = "colorTexture";	///< video shader RGBA sampler name
-			inline constexpr const char* SemanticSegSampler = "semanticSegTexture";	///< video shader RGBA sampler name
+			inline constexpr const char* YSampler  = "yTexture";	///< video shader Y sampler name
+			inline constexpr const char* USampler  = "uTexture";	///< video shader U sampler name
+			inline constexpr const char* VSampler  = "vTexture";	///< video shader V sampler name
 		}
 	}
 
 	/**
+	 * Shader that converts YUV video textures, output by the nap::VideoPlayer, into an RGB image.
 	 * Used by the nap::RenderVideoComponent.
+	 *
+	 * The video shader exposes the following shader variables:
+	 *
+	 * ~~~~~{.frag}
+	 *		uniform sampler2D yTexture;
+	 *		uniform sampler2D uTexture;
+	 *		uniform sampler2D vTexture;
+	 * ~~~~
 	 */
-	class NAPAPI OakShader : public Shader
+	class NAPAPI TestShader : public Shader
 	{
 		RTTI_ENABLE(Shader)
 	public:
-		OakShader(Core& core);
+		TestShader(Core& core);
 
 		/**
 		 * Cross compiles the video GLSL shader code to SPIR-V, creates the shader module and parses all the uniforms and samplers.
@@ -44,6 +51,5 @@ namespace nap
 
 	private:
 		RenderService* mRenderService = nullptr;
-		DepthAICoreService* mDepthAICoreService = nullptr;
 	};
 }

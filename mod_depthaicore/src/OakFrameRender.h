@@ -58,6 +58,7 @@ namespace nap
 		DAINodeType nodeType;
 
 		Texture2D& getRGBATexture();
+		Texture2D& getSegmentationTexture();
 
 		bool textureInit();
 
@@ -77,18 +78,28 @@ namespace nap
 		void updateOakFrame();
 		bool init();
 
-		bool initTexture(std::shared_ptr < dai::ImgFrame > imgFrame);
+		bool initTexture(std::shared_ptr < dai::ImgFrame > imgFrame, glm::vec2 sizeFrameNN);
 
 		std::unique_ptr<Texture2D> texRGBA;
-		SurfaceDescriptor rgbaSurfaceDescriptor;
+		std::unique_ptr<Texture2D> texSegmentation;
+		SurfaceDescriptor rgbaSurfaceDescriptor, segmentationSurfaceDescriptor;
 
 		std::shared_ptr<dai::DataOutputQueue> video = nullptr;
+		std::shared_ptr<dai::DataOutputQueue> qRgb = nullptr;
+		std::shared_ptr<dai::DataOutputQueue> qNN = nullptr;
+		std::shared_ptr<dai::DataInputQueue> inDataInQueue = nullptr;
+
+		std::shared_ptr<dai::RawBuffer> tensor = nullptr;
 
 		void clearTexture();
 
 		bool texturesCreated;
 		glm::vec2 frameSize;
 		int pitch;
+
+		
+
+
 
 		cv::Mat* rgbaMat;
 

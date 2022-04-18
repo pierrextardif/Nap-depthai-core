@@ -64,34 +64,69 @@ namespace nap
 
     bool OakFrameRender::init() {
 
-
-
         std::cout << "init!!" << std::endl;
+
+        pipeline.setOpenVINOVersion(dai::OpenVINO::VERSION_2021_4);
 
         // Define source and output
         auto camRgb = pipeline.create<dai::node::ColorCamera>();
-        auto xoutVideo = pipeline.create<dai::node::XLinkOut>();
+        auto xin = pipeline.create<dai::node::XLinkIn>();
+        auto xoutRGB = pipeline.create<dai::node::XLinkOut>();
+        auto nnOut = pipeline.create<dai::node::XLinkOut>();
 
-        xoutVideo->setStreamName("video");
+        // neural network node
+        std::string nnPath = "C:/Users/pierr/Documents/DEV/NAP/NAP-0.5.0-Win64-x86_64/user_modules/mod_depthaicore/data/nn/deeplabv3p_person_6_shaves.blob";
+        auto detectionNN = pipeline.create<dai::node::NeuralNetwork>();
+        detectionNN->setBlobPath(nnPath);
+        detectionNN->setNumInferenceThreads(2);
+        detectionNN->input.setBlocking(false);
+
+        xoutRGB->setStreamName("rgb");
+        nnOut->setStreamName("segmentation");
+
+        xin->setStreamName("nn_in");
+        xoutRGB->setStreamName("rgb");
+        nnOut->setStreamName("segmentation");
 
         // Properties
+        camRgb->setPreviewSize(256, 256);
         camRgb->setBoardSocket(dai::CameraBoardSocket::RGB);
         camRgb->setResolution(dai::ColorCameraProperties::SensorResolution::THE_1080_P);
         camRgb->setInterleaved(false);
         camRgb->setColorOrder(dai::ColorCameraProperties::ColorOrder::RGB);
 
-        xoutVideo->input.setBlocking(false);
-        xoutVideo->input.setQueueSize(1);
+
+        xin->setMaxDataSize(300 * 300 * 3);
+        xin->setNumFrames(30);
+
+        camRgb->preview.link(detectionNN->input);
+        detectionNN->passthrough.link(xoutRGB->input);
+
+        //xoutRGB->input.setBlocking(false);
+        //xoutRGB->input.setQueueSize(1);
 
         // Linking
-        camRgb->video.link(xoutVideo->input);
+        //camRgb->video.link(xoutRGB->input);
 
+        xin->out.link(detectionNN->input);
+
+
+        detectionNN->out.link(nnOut->input);
+        // 
+        // 
         // Connect to device and start pipeline
         device = new dai::Device(pipeline);
 
-        video = device->getOutputQueue("video");
+
+        //video = device->getOutputQueue("video");
+        qRgb = device->getOutputQueue("rgb", 4, false);
+        qNN = device->getOutputQueue("segmentation", 4, false);
+        inDataInQueue = device->getInputQueue("nn_in");
+
+        tensor = std::make_shared<dai::RawBuffer>();
 
         return true;
+
     }
 
 
@@ -99,12 +134,57 @@ namespace nap
         updateOakFrame();
     }
 
+    // from utilities of depthai-core/examples/utilities
+    void toPlanar(cv::Mat& bgr, std::vector<std::uint8_t>& data) {
+
+        data.resize(bgr.cols * bgr.rows * 3);
+        for (int y = 0; y < bgr.rows; y++) {
+            for (int x = 0; x < bgr.cols; x++) {
+                auto p = bgr.at<cv::Vec3b>(y, x);
+                data[x + y * bgr.cols + 0 * bgr.rows * bgr.cols] = p[0];
+                data[x + y * bgr.cols + 1 * bgr.rows * bgr.cols] = p[1];
+                data[x + y * bgr.cols + 2 * bgr.rows * bgr.cols] = p[2];
+            }
+        }
+    }
 
     void OakFrameRender::updateOakFrame() {
-        if(video){
-            std::shared_ptr < dai::ImgFrame > videoIn = video->tryGet<dai::ImgFrame>();
+        if(qRgb){
 
-            if (videoIn && texturesCreated) {
+
+            std::shared_ptr<dai::ImgFrame> inRgb = qRgb->tryGet<dai::ImgFrame>();
+            std::shared_ptr<dai::NNData> inDet = qNN->tryGet<dai::NNData>();
+
+
+            if (inRgb && inDet && texRGBA != nullptr){
+                cv::Mat frame = inRgb->getCvFrame();
+                toPlanar(frame, tensor->data);
+
+                cv::cvtColor(frame, *rgbaMat, cv::COLOR_RGB2RGBA);
+                texRGBA->update((uint8_t*)rgbaMat->data, rgbaSurfaceDescriptor);
+                
+               inDataInQueue->send(tensor);
+
+
+
+                std::vector<dai::TensorInfo> vecAllLayers = inDet->getAllLayers();
+                if (vecAllLayers.size() > 0) {
+
+                    std::vector<std::int32_t> layer1 = inDet->getLayerInt32(vecAllLayers[0].name);
+                    std::vector<float> layer2 = inDet->getLayerFp16(vecAllLayers[0].name);
+                    std::vector < uint8_t> layerU = inDet->getFirstLayerUInt8();
+                    if(layer1.size() > 0)
+                        texSegmentation->update(layer1.data(), segmentationSurfaceDescriptor);
+                }
+
+            }
+            else {
+                texturesCreated = initTexture(inRgb, { 256, 256 });
+            }
+
+            //std::shared_ptr < dai::ImgFrame > videoIn = video->tryGet<dai::ImgFrame>();
+
+            /*if (videoIn && texturesCreated) {
 
                 assert(texRGBA != nullptr);
 
@@ -114,11 +194,11 @@ namespace nap
             }
             else {
                 texturesCreated = initTexture(videoIn);
-            }
+            }*/
 
         }
     }
-    bool OakFrameRender::initTexture(std::shared_ptr < dai::ImgFrame > imgFrame)
+    bool OakFrameRender::initTexture(std::shared_ptr < dai::ImgFrame > imgFrame, glm::vec2 sizeFrameNN)
     {
         if (texturesCreated) {
             return texturesCreated;
@@ -138,6 +218,17 @@ namespace nap
                 texRGBA->mUsage = ETextureUsage::DynamicWrite;
                 if (!texRGBA->init(rgbaSurfaceDescriptor, false, 0, error))
                     return false;
+
+                segmentationSurfaceDescriptor.mWidth = sizeFrameNN.x;
+                segmentationSurfaceDescriptor.mHeight = sizeFrameNN.y;
+                segmentationSurfaceDescriptor.mColorSpace = EColorSpace::Linear;
+                segmentationSurfaceDescriptor.mDataType = ESurfaceDataType::FLOAT;
+                segmentationSurfaceDescriptor.mChannels = ESurfaceChannels::R;
+                texSegmentation = std::make_unique<Texture2D>(mService.getCore());
+                texSegmentation->mUsage = ETextureUsage::DynamicWrite;
+                if (!texSegmentation->init(segmentationSurfaceDescriptor, false, 0, error))
+                    return false;
+
 
                 const size_t sizeFrame = static_cast<const size_t>(rgbaSurfaceDescriptor.getSizeInBytes());
                 rgbaMat = new cv::Mat(frameSize.x, frameSize.y, CV_8UC4);
@@ -161,15 +252,10 @@ namespace nap
     {
         float vid_x = frameSize.x;
         float vid_y = frameSize.y;
-        float uv_x = vid_x * 0.5f;
-        float uv_y = vid_y * 0.5f;
 
 
         std::vector<uint8_t> y_default_data(vid_x * vid_y, 16);
         std::vector<uint8_t> rgba_default_data(vid_x * vid_y * 4, 16);
-
-        // Initialize UV planes
-        std::vector<uint8_t> uv_default_data(uv_x * uv_y, 127);
 
 
 
@@ -180,6 +266,12 @@ namespace nap
 
         NAP_ASSERT_MSG(texRGBA != nullptr, "Missing video RGBA texture");
         return *texRGBA;
+    }
+
+    nap::Texture2D& OakFrameRender::getSegmentationTexture() {
+
+        NAP_ASSERT_MSG(texSegmentation != nullptr, "Missing video RGBA texture");
+        return *texSegmentation;
     }
 
 
