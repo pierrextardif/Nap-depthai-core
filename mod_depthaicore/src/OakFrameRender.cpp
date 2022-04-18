@@ -174,7 +174,7 @@ namespace nap
                     std::vector<float> layer2 = inDet->getLayerFp16(vecAllLayers[0].name);
                     std::vector < uint8_t> layerU = inDet->getFirstLayerUInt8();
                     if(layer1.size() > 0)
-                        texSegmentation->update(layer1.data(), segmentationSurfaceDescriptor);
+                        texSegmentation->update((uint8_t*)layer1.data(), segmentationSurfaceDescriptor);
                 }
 
             }
@@ -222,8 +222,8 @@ namespace nap
                 segmentationSurfaceDescriptor.mWidth = sizeFrameNN.x;
                 segmentationSurfaceDescriptor.mHeight = sizeFrameNN.y;
                 segmentationSurfaceDescriptor.mColorSpace = EColorSpace::Linear;
-                segmentationSurfaceDescriptor.mDataType = ESurfaceDataType::FLOAT;
-                segmentationSurfaceDescriptor.mChannels = ESurfaceChannels::R;
+                segmentationSurfaceDescriptor.mDataType = ESurfaceDataType::BYTE;
+                segmentationSurfaceDescriptor.mChannels = ESurfaceChannels::RGBA;
                 texSegmentation = std::make_unique<Texture2D>(mService.getCore());
                 texSegmentation->mUsage = ETextureUsage::DynamicWrite;
                 if (!texSegmentation->init(segmentationSurfaceDescriptor, false, 0, error))

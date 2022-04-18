@@ -57,10 +57,10 @@ in vec3 pass_Uvs;
 out vec4 out_Color;
 void main() 
 {
-	vec4 originalColors = vec4(texture(colorTexture,vec2(pass_Uvs.x, 1.0 - pass_Uvs.y)).rgb, 1.0);
-	vec3 human = texture(semanticSegTexture,vec2(pass_Uvs.x, 1.0 - pass_Uvs.y)).rgb;
+	vec3 originalColors = texture(colorTexture,vec2(pass_Uvs.x, 1.0 - pass_Uvs.y)).rgb;
+	float human = texture(semanticSegTexture,vec2(pass_Uvs.x, 1.0 - pass_Uvs.y)).r * 255.;
 
-	out_Color = vec4( human * 255., 1.0);
+	out_Color = vec4( originalColors.rgb * human, 1.0);
 
 })glslang";
 
