@@ -64,6 +64,9 @@ namespace nap
 		glm::vec2 getOakFrameSize();
 
 
+		DepthAICoreService& getService(); 
+
+
 	private :
 
 		DepthAICoreService& mService;
@@ -88,6 +91,7 @@ namespace nap
 		int pitch;
 
 		uint8_t* tmpBuffer;
+		cv::Mat* rgbaMat;
 
 		// helper
 		std::vector<uint8_t> createUVTexture(bool vTex);

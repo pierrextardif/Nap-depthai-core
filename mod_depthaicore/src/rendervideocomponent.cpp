@@ -1,7 +1,11 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 // Local Includes
-#include "renderoakcameracomponent.h"
-#include "oakshader.h"
+#include "rendervideocomponent.h"
+#include "testframerender.h"
+#include "testshader.h"
 
 // External Includes
 #include <entity.h>
@@ -11,22 +15,28 @@
 #include <renderglobals.h>
 #include <glm/gtc/matrix_transform.hpp>
 
-
-RTTI_BEGIN_CLASS(nap::RenderOakCameraComponent)
-RTTI_PROPERTY("OAK frame",				&nap::RenderOakCameraComponent::mOakFrame,			nap::rtti::EPropertyMetaData::Required);
-RTTI_PROPERTY("Rendering Texture",		&nap::RenderOakCameraComponent::mOutputTexture,		nap::rtti::EPropertyMetaData::Required);
+// nap::rendervideototexturecomponent run time class definition 
+RTTI_BEGIN_CLASS(nap::RenderVideoComponent)
+	RTTI_PROPERTY("OutputTexture",	&nap::RenderVideoComponent::mOutputTexture,			nap::rtti::EPropertyMetaData::Required)
+	RTTI_PROPERTY("testFrameRender",	&nap::RenderVideoComponent::testFrameRender,			nap::rtti::EPropertyMetaData::Required)
+	RTTI_PROPERTY("Samples",		&nap::RenderVideoComponent::mRequestedSamples,		nap::rtti::EPropertyMetaData::Default)
+	RTTI_PROPERTY("ClearColor",		&nap::RenderVideoComponent::mClearColor,			nap::rtti::EPropertyMetaData::Default)
 RTTI_END_CLASS
 
-RTTI_BEGIN_CLASS_NO_DEFAULT_CONSTRUCTOR(nap::RenderOakCameraComponentInstance)
-RTTI_CONSTRUCTOR(nap::EntityInstance&, nap::Component&)
+// nap::rendervideototexturecomponentInstance run time class definition 
+RTTI_BEGIN_CLASS_NO_DEFAULT_CONSTRUCTOR(nap::RenderVideoComponentInstance)
+	RTTI_CONSTRUCTOR(nap::EntityInstance&, nap::Component&)
 RTTI_END_CLASS
 
-
+//////////////////////////////////////////////////////////////////////////
 
 
 namespace nap
 {
-	static void computeModelMatrix(const nap::IRenderTarget& target, glm::mat4& outMatrix) 
+	/**
+	 * Creates a model matrix based on the dimensions of the given target.
+	 */
+	static void computeModelMatrix(const nap::IRenderTarget& target, glm::mat4& outMatrix)
 	{
 		// Transform to middle of target
 		glm::ivec2 tex_size = target.getBufferSize();
@@ -35,31 +45,40 @@ namespace nap
 			tex_size.y / 2.0f,
 			0.0f));
 
+		// Scale to fit target
 		outMatrix = glm::scale(outMatrix, glm::vec3(tex_size.x, tex_size.y, 1.0f));
-
 	}
 
-	RenderOakCameraComponentInstance::RenderOakCameraComponentInstance(EntityInstance& entity, Component& resource) :RenderableComponentInstance(entity, resource),
-		mTarget(*entity.getCore()), mPlane(*entity.getCore())
-	{
-	}
 
-	bool RenderOakCameraComponentInstance::init(utility::ErrorState& errorState)
+	RenderVideoComponentInstance::RenderVideoComponentInstance(EntityInstance& entity, Component& resource) :
+		RenderableComponentInstance(entity, resource),
+		mTarget(*entity.getCore()),
+		mPlane(*entity.getCore())	{ }
+
+
+	bool RenderVideoComponentInstance::init(utility::ErrorState& errorState)
 	{
 		if (!RenderableComponentInstance::init(errorState))
 			return false;
 
-		RenderOakCameraComponent* resource = getComponent<RenderOakCameraComponent>();
-		
-		mOakFrame = resource->mOakFrame.get();
+		// Get resource
+		RenderVideoComponent* resource = getComponent<RenderVideoComponent>();
+
+		// Extract player
+		testFrameRender = resource->testFrameRender.get();
+		if (!errorState.check(testFrameRender != nullptr, "%s: no video player", resource->mID.c_str()))
+			return false;
+
+		// Extract output texture to render to and make sure format is correct
 		mOutputTexture = resource->mOutputTexture.get();
 		if (!errorState.check(mOutputTexture != nullptr, "%s: no output texture", resource->mID.c_str()))
 			return false;
 		if (!errorState.check(mOutputTexture->mFormat == RenderTexture2D::EFormat::RGBA8, "%s: output texture color format is not RGBA8", resource->mID.c_str()))
 			return false;
+
+		// Setup render target and initialize
 		mTarget.mClearColor = resource->mClearColor.convert<RGBAColorFloat>();
-		//mTarget.mClearColor = RGBAColor8(1., 1., 1., 1.);
-		mTarget.mColorTexture = resource->mOutputTexture;
+		mTarget.mColorTexture  = resource->mOutputTexture;
 		mTarget.mSampleShading = true;
 		mTarget.mRequestedSamples = resource->mRequestedSamples;
 		if (!mTarget.init(errorState))
@@ -81,18 +100,17 @@ namespace nap
 		mRenderService = getEntityInstance()->getCore()->getService<RenderService>();
 		assert(mRenderService != nullptr);
 
-
 		// Get video material
-		Material* oakMaterial = mRenderService->getOrCreateMaterial<OakShader>(errorState);
-		if (!errorState.check(oakMaterial != nullptr, "%s: unable to get or create video material", resource->mID.c_str()))
+		Material* video_material = mRenderService->getOrCreateMaterial<TestShader>(errorState);
+		if (!errorState.check(video_material != nullptr, "%s: unable to get or create video material", resource->mID.c_str()))
 			return false;
 
 		// Create resource for the video material instance
 		mMaterialInstanceResource.mBlendMode = EBlendMode::Opaque;
 		mMaterialInstanceResource.mDepthMode = EDepthMode::NoReadWrite;
-		mMaterialInstanceResource.mMaterial = oakMaterial;
+		mMaterialInstanceResource.mMaterial  = video_material;
 
-		// Initialize oak material instance, used for rendering video
+		// Initialize video material instance, used for rendering video
 		if (!mMaterialInstance.init(*mRenderService, mMaterialInstanceResource, errorState))
 			return false;
 
@@ -111,30 +129,51 @@ namespace nap
 			return false;
 
 		// Get sampler inputs to update from video material
-		mRGBASampler = ensureSampler(uniform::oakVideo::RGBASampler, errorState);
+		
 
-		if (mRGBASampler == nullptr)
+		if (mYSampler == nullptr || mUSampler == nullptr || mVSampler == nullptr)
 			return false;
-
 
 		// Create the renderable mesh, which represents a valid mesh / material combination
 		mRenderableMesh = mRenderService->createRenderableMesh(mPlane, mMaterialInstance, errorState);
 		if (!mRenderableMesh.isValid())
 			return false;
 
-
-
-
 		return true;
 	}
 
-	bool RenderOakCameraComponentInstance::isSupported(nap::CameraComponentInstance& camera) const
+
+	bool RenderVideoComponentInstance::isSupported(nap::CameraComponentInstance& camera) const
 	{
 		return camera.get_type().is_derived_from(RTTI_OF(OrthoCameraComponentInstance));
 	}
 
 
-	void RenderOakCameraComponentInstance::onDraw(IRenderTarget& renderTarget, VkCommandBuffer commandBuffer, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix)
+	nap::Texture2D& RenderVideoComponentInstance::getOutputTexture()
+	{
+		return mTarget.getColorTexture();
+	}
+
+
+	void RenderVideoComponentInstance::draw()
+	{
+		// Get current command buffer, should be headless.
+		VkCommandBuffer command_buffer = mRenderService->getCurrentCommandBuffer();
+
+		// Create orthographic projection matrix
+		glm::ivec2 size = mTarget.getBufferSize();
+
+		// Create projection matrix
+		glm::mat4 proj_matrix = OrthoCameraComponentInstance::createRenderProjectionMatrix(0.0f, (float)size.x, 0.0f, (float)size.y);
+
+		// Call on draw
+		mTarget.beginRendering();
+		onDraw(mTarget, command_buffer, glm::mat4(), proj_matrix);
+		mTarget.endRendering();
+	}
+
+
+	void RenderVideoComponentInstance::onDraw(IRenderTarget& renderTarget, VkCommandBuffer commandBuffer, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix)
 	{
 		// Update the model matrix so that the plane mesh is of the same size as the render target
 		computeModelMatrix(renderTarget, mModelMatrix);
@@ -169,8 +208,9 @@ namespace nap
 			vkCmdDrawIndexed(commandBuffer, index_buffer.getCount(), 1, 0, 0, 0);
 		}
 	}
-	
-	UniformMat4Instance* RenderOakCameraComponentInstance::ensureUniform(const std::string& uniformName, utility::ErrorState& error)
+
+
+	nap::UniformMat4Instance* RenderVideoComponentInstance::ensureUniform(const std::string& uniformName, utility::ErrorState& error)
 	{
 		assert(mMVPStruct != nullptr);
 		UniformMat4Instance* found_uniform = mMVPStruct->getOrCreateUniform<UniformMat4Instance>(uniformName);
@@ -181,12 +221,8 @@ namespace nap
 		return found_uniform;
 	}
 
-	/**
-	 * Checks if the sampler with the given name is available on the source material and creates it if so
-	 * @return new or created sampler
-	 */
 
-	Sampler2DInstance* RenderOakCameraComponentInstance::ensureSampler(const std::string& samplerName, utility::ErrorState& error)
+	nap::Sampler2DInstance* RenderVideoComponentInstance::ensureSampler(const std::string& samplerName, utility::ErrorState& error)
 	{
 		Sampler2DInstance* found_sampler = mMaterialInstance.getOrCreateSampler<Sampler2DInstance>(samplerName);
 		if (!error.check(found_sampler != nullptr,
@@ -196,48 +232,4 @@ namespace nap
 		return found_sampler;
 	}
 
-	void RenderOakCameraComponentInstance::draw()
-	{
-		// Get current command buffer, should be headless.
-		VkCommandBuffer command_buffer = mRenderService->getCurrentCommandBuffer();
-
-		// Create orthographic projection matrix
-		glm::ivec2 size = mTarget.getBufferSize();
-
-		// Create projection matrix
-		glm::mat4 proj_matrix = OrthoCameraComponentInstance::createRenderProjectionMatrix(0.0f, (float)size.x, 0.0f, (float)size.y);
-
-
-		if (!hasBeenSet)
-			hasBeenSet = setContentSampler();
-
-		// Call on draw
-		mTarget.beginRendering();
-		onDraw(mTarget, command_buffer, glm::mat4(), proj_matrix);
-		mTarget.endRendering();
-	}
-
-
-
-
-	bool RenderOakCameraComponentInstance::setContentSampler()
-	{
-
-
-		if (mOakFrame != nullptr) {
-
-			if (mOakFrame->textureInit()) {
-				mRGBASampler->setTexture(mOakFrame->getRGBATexture());
-				return false;
-			}
-			else {
-				return false;
-			}
-
-		}
-		return false;
-	}
-
-
-	
 }

@@ -8,7 +8,7 @@
 #include <shader.h>
 
 // Service include
-#include <depthaicoreservice.h>
+#include <oakframerender.h>
 
 namespace nap
 {
@@ -43,5 +43,6 @@ namespace nap
 
 	private:
 		RenderService* mRenderService = nullptr;
+		DepthAICoreService* mDepthAICoreService = nullptr;
 	};
 }

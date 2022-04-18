@@ -57,6 +57,10 @@ namespace nap
 
     }
 
+    DepthAICoreService& OakFrameRender::getService(){
+        return mService;
+    }
+
 
     bool OakFrameRender::init() {
 
@@ -105,20 +109,24 @@ namespace nap
                 assert(texRGBA != nullptr);
                 //texRGBA->update(videoIn->getFrame()
 
-                cv::Mat tmpColor = videoIn->getFrame(true);
+                //cv::Mat tmpColor = videoIn->getCvFrame();
+                //videoIn->setFrame(cv::Mat(frameSize.x, frameSize.y, CV_8UC4, tmpBuffer));
                 //cv::imshow("rgb", tmpColor);
-                /*cv::Mat* dataMat = new cv::Mat();
-                cv::cvtColor(videoIn->getFrame(), *dataMat, cv::COLOR_RGB2RGBA, 4);*/
 
-                assert(tmpColor.data != nullptr);
+                if (videoIn->getCvFrame().channels() == 3){
+                    cv::cvtColor(videoIn->getCvFrame(), *rgbaMat, cv::COLOR_RGB2RGBA);
 
-                size_t sizeToCopy = frameSize.x * frameSize.y;
+                    //assert(dataMat->data != nullptr);
+                     
+                    //size_t sizeToCopy = frameSize.x * frameSize.y * 2;
 
-                
 
-                memcpy(tmpBuffer, tmpColor.data, sizeToCopy);
 
-                texRGBA->update(static_cast<const void *>(tmpBuffer), rgbaSurfaceDescriptor);
+                    //memcpy(tmpBuffer, tmpColor.data, sizeToCopy * sizeof(tmpColor.data));
+
+                    //if(tmpBuffer != NULL)
+                    texRGBA->update((uint8_t *)rgbaMat->data, rgbaSurfaceDescriptor);
+                }
 
             }
             else {
@@ -154,6 +162,28 @@ namespace nap
 
                 const size_t sizeFrame = static_cast<const size_t>(rgbaSurfaceDescriptor.getSizeInBytes());
                 tmpBuffer = new uint8_t[sizeFrame];
+                rgbaMat = new cv::Mat(frameSize.x, frameSize.y, CV_8UC4);
+                *rgbaMat = cv::Scalar::all(255);
+
+                //for (int i = 0; i < rgbaMat->rows; i++) {
+                //    for (int j = 0; j < rgbaMat->cols; j++) {
+
+                //        //int index = (j * (rgbaMat->rows) + i) * rgbaMat->channels();
+
+                //        //rgbaMat->at<cv::Vec2f>(i, j)[0] = 255;
+                //        rgbaMat->at<cv::Vec2f>(i, j) = 255;
+                //        //rgbaMat->at<cv::Vec2f>(i, j)[2] = 255;
+                //        //rgbaMat->at<cv::Vec2f>(i, j)[3] = 255;
+                //        
+                //        /*rgbaMat[index + 1] = 255 - 125 * (float)index / (float)(frameSize.x * frameSize.y);
+                //        rgbaMat[index + 2] = 255;
+                //        rgbaMat[index + 3] = 255;*/
+
+                //    }
+                //}
+
+
+                
 
 
                 clearTexture();
