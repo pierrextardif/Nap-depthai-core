@@ -228,7 +228,7 @@ namespace nap
 
 			if (mOakFrame->textureInit()) {
 				mRGBASampler->setTexture(mOakFrame->getRGBATexture());
-				return false;
+				return true;
 			}
 			else {
 				return false;

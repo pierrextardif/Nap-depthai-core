@@ -1,7 +1,6 @@
 #pragma once
 
 #include <oakframerender.h>
-#include <testframerender.h>
 
 // External Includes
 #include <nap/service.h>
@@ -55,7 +54,6 @@ namespace nap
 		* Registers a frame renderer with the service
 		*/
 		void registerOakFrame(nap::OakFrameRender& nFrame);
-		void registerTestFrame(nap::TestFrameRender& nFrame);
 
 		/**
 		* Removes a frame renderer from the service
@@ -72,7 +70,6 @@ namespace nap
 	private:
 
 		std::vector< nap::OakFrameRender* > mOakFrames;
-		std::vector< nap::TestFrameRender* > mTestFrames;
 
 	};
 }

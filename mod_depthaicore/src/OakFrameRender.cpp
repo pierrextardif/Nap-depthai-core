@@ -107,26 +107,9 @@ namespace nap
             if (videoIn && texturesCreated) {
 
                 assert(texRGBA != nullptr);
-                //texRGBA->update(videoIn->getFrame()
 
-                //cv::Mat tmpColor = videoIn->getCvFrame();
-                //videoIn->setFrame(cv::Mat(frameSize.x, frameSize.y, CV_8UC4, tmpBuffer));
-                //cv::imshow("rgb", tmpColor);
-
-                if (videoIn->getCvFrame().channels() == 3){
-                    cv::cvtColor(videoIn->getCvFrame(), *rgbaMat, cv::COLOR_RGB2RGBA);
-
-                    //assert(dataMat->data != nullptr);
-                     
-                    //size_t sizeToCopy = frameSize.x * frameSize.y * 2;
-
-
-
-                    //memcpy(tmpBuffer, tmpColor.data, sizeToCopy * sizeof(tmpColor.data));
-
-                    //if(tmpBuffer != NULL)
-                    texRGBA->update((uint8_t *)rgbaMat->data, rgbaSurfaceDescriptor);
-                }
+                cv::cvtColor(videoIn->getCvFrame(), *rgbaMat, cv::COLOR_RGB2RGBA);
+                texRGBA->update((uint8_t *)rgbaMat->data, rgbaSurfaceDescriptor);
 
             }
             else {
@@ -145,45 +128,20 @@ namespace nap
             if (imgFrame->getWidth()!= 0 && imgFrame->getHeight()!= 0) {
 
                 frameSize = { imgFrame->getWidth(), imgFrame->getHeight() };
-                pitch = frameSize.x * 3;
-
-
-
                 
                 rgbaSurfaceDescriptor.mWidth = frameSize.x;
                 rgbaSurfaceDescriptor.mHeight = frameSize.y;
                 rgbaSurfaceDescriptor.mColorSpace = EColorSpace::Linear;
                 rgbaSurfaceDescriptor.mDataType = ESurfaceDataType::BYTE;
-                rgbaSurfaceDescriptor.mChannels = ESurfaceChannels::RGBA;
+                rgbaSurfaceDescriptor.mChannels = ESurfaceChannels::BGRA;
                 texRGBA = std::make_unique<Texture2D>(mService.getCore());
                 texRGBA->mUsage = ETextureUsage::DynamicWrite;
                 if (!texRGBA->init(rgbaSurfaceDescriptor, false, 0, error))
                     return false;
 
                 const size_t sizeFrame = static_cast<const size_t>(rgbaSurfaceDescriptor.getSizeInBytes());
-                tmpBuffer = new uint8_t[sizeFrame];
                 rgbaMat = new cv::Mat(frameSize.x, frameSize.y, CV_8UC4);
                 *rgbaMat = cv::Scalar::all(255);
-
-                //for (int i = 0; i < rgbaMat->rows; i++) {
-                //    for (int j = 0; j < rgbaMat->cols; j++) {
-
-                //        //int index = (j * (rgbaMat->rows) + i) * rgbaMat->channels();
-
-                //        //rgbaMat->at<cv::Vec2f>(i, j)[0] = 255;
-                //        rgbaMat->at<cv::Vec2f>(i, j) = 255;
-                //        //rgbaMat->at<cv::Vec2f>(i, j)[2] = 255;
-                //        //rgbaMat->at<cv::Vec2f>(i, j)[3] = 255;
-                //        
-                //        /*rgbaMat[index + 1] = 255 - 125 * (float)index / (float)(frameSize.x * frameSize.y);
-                //        rgbaMat[index + 2] = 255;
-                //        rgbaMat[index + 3] = 255;*/
-
-                //    }
-                //}
-
-
-                
 
 
                 clearTexture();
@@ -206,9 +164,7 @@ namespace nap
         float uv_x = vid_x * 0.5f;
         float uv_y = vid_y * 0.5f;
 
-        // YUV420p to RGB conversion uses an 'offset' value of (-0.0625, -0.5, -0.5) in the shader. 
-        // This means that initializing the YUV planes to zero does not actually result in black output.
-        // To fix this, we initialize the YUV planes to the negative of the offset
+
         std::vector<uint8_t> y_default_data(vid_x * vid_y, 16);
         std::vector<uint8_t> rgba_default_data(vid_x * vid_y * 4, 16);
 

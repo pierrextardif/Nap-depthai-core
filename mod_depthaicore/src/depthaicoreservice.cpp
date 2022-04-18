@@ -57,11 +57,6 @@ namespace nap
 		factory.addObjectCreator(std::make_unique<OakFrameRenderObjectCreator>(*this));
 	}
 
-	void DepthAICoreService::registerTestFrame(nap::TestFrameRender& nFrame) 
-	{
-		mTestFrames.emplace_back(&nFrame);
-	}
-
 	void DepthAICoreService::registerOakFrame(nap::OakFrameRender& nFrame)
 	{
 		mOakFrames.emplace_back(&nFrame);

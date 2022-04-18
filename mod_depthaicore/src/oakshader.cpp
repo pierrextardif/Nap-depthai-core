@@ -56,13 +56,7 @@ in vec3 pass_Uvs;
 out vec4 out_Color;
 void main() 
 {
-	vec4 col = texture(colorTexture, pass_Uvs.xy);
-	
-	col.a = 1.0;
-	vec4 outCol = col;
-	//if(col.r <0.02 && col.g < 0.02 && col.b < 0.02)outCol += vec4(1., 0., 1., 1.);
-	out_Color = outCol;
-
+	out_Color = vec4(texture(colorTexture,vec2(pass_Uvs.x, 1.0 - pass_Uvs.y)).rgb, 1.0);
 })glslang";
 
 //texture(colorTexture, pass_Uvs.xy);

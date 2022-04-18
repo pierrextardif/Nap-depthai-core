@@ -90,7 +90,6 @@ namespace nap
 		glm::vec2 frameSize;
 		int pitch;
 
-		uint8_t* tmpBuffer;
 		cv::Mat* rgbaMat;
 
 		// helper
