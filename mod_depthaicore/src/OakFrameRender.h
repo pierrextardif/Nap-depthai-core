@@ -36,8 +36,6 @@ namespace nap
 	};
 
 
-
-
 	
 	class NAPAPI OakFrameRender : public Device
 	{
@@ -56,6 +54,7 @@ namespace nap
 
 		//DAIIputOutput type = DAIIputOutput::InputLink;
 		DAINodeType nodeType;
+		std::string nnPath = "C:/Users/pierr/Documents/DEV/NAP/NAP-0.5.0-Win64-x86_64/user_modules/mod_depthaicore/data/nn/deeplabv3p_person_6_shaves.blob";
 
 		Texture2D& getRGBATexture();
 		Texture2D& getSegmentationTexture();
@@ -95,6 +94,7 @@ namespace nap
 
 		bool texturesCreated;
 		glm::vec2 frameSize;
+		glm::vec2 previewSize;
 		int pitch;
 
 		

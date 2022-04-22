@@ -29,6 +29,7 @@ RTTI_END_ENUM
 // nap::rendervideototexturecomponentInstance run time class definition 
 RTTI_BEGIN_CLASS_NO_DEFAULT_CONSTRUCTOR(nap::OakFrameRender)
     RTTI_PROPERTY("node Type", &nap::OakFrameRender::nodeType, nap::rtti::EPropertyMetaData::Required)
+    RTTI_PROPERTY_FILELINK("Neural Network Path", &nap::OakFrameRender::nnPath, nap::rtti::EPropertyMetaData::Required, nap::rtti::EPropertyFileType::Any)
 
 RTTI_END_CLASS
 
@@ -66,6 +67,8 @@ namespace nap
 
         std::cout << "init!!" << std::endl;
 
+        previewSize = { 256, 256 };
+
         pipeline.setOpenVINOVersion(dai::OpenVINO::VERSION_2021_4);
 
         // Define source and output
@@ -85,11 +88,10 @@ namespace nap
         nnOut->setStreamName("segmentation");
 
         xin->setStreamName("nn_in");
-        xoutRGB->setStreamName("rgb");
         nnOut->setStreamName("segmentation");
 
         // Properties
-        camRgb->setPreviewSize(256, 256);
+        camRgb->setPreviewSize(previewSize.x, previewSize.x);
         camRgb->setBoardSocket(dai::CameraBoardSocket::RGB);
         camRgb->setResolution(dai::ColorCameraProperties::SensorResolution::THE_1080_P);
         camRgb->setInterleaved(false);
@@ -102,9 +104,6 @@ namespace nap
         camRgb->preview.link(detectionNN->input);
         detectionNN->passthrough.link(xoutRGB->input);
 
-        //xoutRGB->input.setBlocking(false);
-        //xoutRGB->input.setQueueSize(1);
-
         // Linking
         //camRgb->video.link(xoutRGB->input);
 
@@ -112,13 +111,11 @@ namespace nap
 
 
         detectionNN->out.link(nnOut->input);
-        // 
-        // 
+
         // Connect to device and start pipeline
         device = new dai::Device(pipeline);
 
 
-        //video = device->getOutputQueue("video");
         qRgb = device->getOutputQueue("rgb", 4, false);
         qNN = device->getOutputQueue("segmentation", 4, false);
         inDataInQueue = device->getInputQueue("nn_in");
@@ -163,7 +160,7 @@ namespace nap
                 cv::cvtColor(frame, *rgbaMat, cv::COLOR_RGB2RGBA);
                 texRGBA->update((uint8_t*)rgbaMat->data, rgbaSurfaceDescriptor);
                 
-               inDataInQueue->send(tensor);
+                inDataInQueue->send(tensor);
 
 
 
@@ -179,23 +176,8 @@ namespace nap
 
             }
             else {
-                texturesCreated = initTexture(inRgb, { 256, 256 });
+                texturesCreated = initTexture(inRgb, previewSize);
             }
-
-            //std::shared_ptr < dai::ImgFrame > videoIn = video->tryGet<dai::ImgFrame>();
-
-            /*if (videoIn && texturesCreated) {
-
-                assert(texRGBA != nullptr);
-
-                cv::cvtColor(videoIn->getCvFrame(), *rgbaMat, cv::COLOR_RGB2RGBA);
-                texRGBA->update((uint8_t *)rgbaMat->data, rgbaSurfaceDescriptor);
-
-            }
-            else {
-                texturesCreated = initTexture(videoIn);
-            }*/
-
         }
     }
     bool OakFrameRender::initTexture(std::shared_ptr < dai::ImgFrame > imgFrame, glm::vec2 sizeFrameNN)

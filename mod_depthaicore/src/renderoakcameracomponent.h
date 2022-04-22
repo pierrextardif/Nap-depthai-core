@@ -66,9 +66,6 @@ namespace nap
 		UniformStructInstance*		mMVPStruct = nullptr;							///< model view projection struct
 		Sampler2DInstance*			mRGBASampler = nullptr;							///< Video material Y sampler
 		Sampler2DInstance*			mSemanticSegSampler = nullptr;							///< Video material Y sampler
-		Sampler2DInstance*			mYSampler = nullptr;							///< Video material Y sampler
-		Sampler2DInstance*			mUSampler = nullptr;							///< Video material U sampler
-		Sampler2DInstance*			mVSampler = nullptr;							///< Video material V sampler
 		glm::mat4x4					mModelMatrix;									///< Computed model matrix, used to scale plane to fit target bounds
 		bool						mDirty = true;	
 
