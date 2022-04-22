@@ -55,6 +55,7 @@ namespace nap
 	void DepthAICoreService::registerObjectCreators(rtti::Factory& factory)
 	{
 		factory.addObjectCreator(std::make_unique<OakFrameRenderObjectCreator>(*this));
+		factory.addObjectCreator(std::make_unique<ColorCameraNodeObjectCreator>(*this));
 	}
 
 	void DepthAICoreService::registerOakFrame(nap::OakFrameRender& nFrame)

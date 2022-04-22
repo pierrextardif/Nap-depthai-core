@@ -1,6 +1,7 @@
 #pragma once
 
 #include <oakframerender.h>
+#include <colorcameranode.h>
 
 // External Includes
 #include <nap/service.h>
@@ -54,6 +55,7 @@ namespace nap
 		* Registers a frame renderer with the service
 		*/
 		void registerOakFrame(nap::OakFrameRender& nFrame);
+
 
 		/**
 		* Removes a frame renderer from the service

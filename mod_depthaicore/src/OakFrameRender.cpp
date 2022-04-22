@@ -78,13 +78,13 @@ namespace nap
         auto nnOut = pipeline.create<dai::node::XLinkOut>();
 
         // neural network node
-        std::string nnPath = "C:/Users/pierr/Documents/DEV/NAP/NAP-0.5.0-Win64-x86_64/user_modules/mod_depthaicore/data/nn/deeplabv3p_person_6_shaves.blob";
         auto detectionNN = pipeline.create<dai::node::NeuralNetwork>();
         detectionNN->setBlobPath(nnPath);
         detectionNN->setNumInferenceThreads(2);
         detectionNN->input.setBlocking(false);
 
         xoutRGB->setStreamName("rgb");
+        xoutRGB->getStreamName();
         nnOut->setStreamName("segmentation");
 
         xin->setStreamName("nn_in");
