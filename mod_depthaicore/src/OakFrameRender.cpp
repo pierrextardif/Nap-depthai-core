@@ -29,8 +29,6 @@ RTTI_END_ENUM
 // nap::rendervideototexturecomponentInstance run time class definition 
 RTTI_BEGIN_CLASS_NO_DEFAULT_CONSTRUCTOR(nap::OakFrameRender)
     RTTI_PROPERTY("node Type", &nap::OakFrameRender::nodeType, nap::rtti::EPropertyMetaData::Required)
-    RTTI_PROPERTY_FILELINK("Neural Network Path", &nap::OakFrameRender::nnPath, nap::rtti::EPropertyMetaData::Required, nap::rtti::EPropertyFileType::Any)
-
 RTTI_END_CLASS
 
 //////////////////////////////////////////////////////////////////////////
@@ -79,7 +77,7 @@ namespace nap
 
         // neural network node
         auto detectionNN = pipeline.create<dai::node::NeuralNetwork>();
-        detectionNN->setBlobPath(nnPath);
+        //detectionNN->setBlobPath(nnPath);
         detectionNN->setNumInferenceThreads(2);
         detectionNN->input.setBlocking(false);
 

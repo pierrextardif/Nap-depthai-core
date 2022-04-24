@@ -6,6 +6,7 @@
 #include <nap/numeric.h>
 #include <texture2d.h>
 
+#include <nap/resourceptr.h>
 #include <depthaicoreservice.h>
 
 #include "depthai/depthai.hpp"
@@ -22,7 +23,7 @@ namespace nap
 	class NAPAPI ColorCameraNode : public Device
 	{
 		RTTI_ENABLE(Device)
-			friend class DepthAICoreService;
+		friend class DepthAICoreService;
 
 
 	public:
@@ -40,6 +41,11 @@ namespace nap
 		bool interleaved = false;
 		dai::ColorCameraProperties::ColorOrder colorOrder = dai::ColorCameraProperties::ColorOrder::RGB;
 
+
+		std::shared_ptr < dai::node::ColorCamera> getCam();
+		glm::vec2 getPreviewSize() {
+			return { cam->getPreviewWidth(), cam->getPreviewHeight() };
+		}
 	private:
 
 		dai::Pipeline pipeline;

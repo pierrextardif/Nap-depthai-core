@@ -48,10 +48,16 @@ namespace nap
 
 	}
 
+	std::shared_ptr < dai::node::ColorCamera > ColorCameraNode::getCam() 
+	{
+		return cam;
+	}
+
+
 	bool ColorCameraNode::start(utility::ErrorState& errorState) {
 		return true;
 	}
-	
+
 	void ColorCameraNode::stop()
 	{
 

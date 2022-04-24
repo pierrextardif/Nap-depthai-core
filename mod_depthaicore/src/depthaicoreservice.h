@@ -2,6 +2,7 @@
 
 #include <oakframerender.h>
 #include <colorcameranode.h>
+#include <neuralnetworknode.h>
 
 // External Includes
 #include <nap/service.h>

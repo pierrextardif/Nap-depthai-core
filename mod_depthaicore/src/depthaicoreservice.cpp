@@ -56,6 +56,8 @@ namespace nap
 	{
 		factory.addObjectCreator(std::make_unique<OakFrameRenderObjectCreator>(*this));
 		factory.addObjectCreator(std::make_unique<ColorCameraNodeObjectCreator>(*this));
+		factory.addObjectCreator(std::make_unique<NeuralNetworkNodeObjectCreator>(*this));
+		//factory.addObjectCreator(std::make_unique<SemanticSegmentationObjectCreator>(*this));
 	}
 
 	void DepthAICoreService::registerOakFrame(nap::OakFrameRender& nFrame)
