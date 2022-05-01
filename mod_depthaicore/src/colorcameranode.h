@@ -48,6 +48,8 @@ namespace nap
 		}
 	private:
 
+		DepthAICoreService& mService;
+
 		dai::Pipeline pipeline;
 		std::shared_ptr < dai::node::ColorCamera > cam;
 

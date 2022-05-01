@@ -18,12 +18,19 @@ RTTI_END_CLASS
 
 namespace nap
 {
-	NeuralNetworkNode::NeuralNetworkNode(DepthAICoreService& service)
+	NeuralNetworkNode::NeuralNetworkNode(DepthAICoreService& service):
+		mService(service)
 	{
+		std::cout << "creation of the NeuralNetWork node" << std::endl;
 
 	}
 
 	bool NeuralNetworkNode::start(utility::ErrorState& errorState) {
+
+		std::cout << "starting the NeuralNetWork node" << std::endl;
+		pipeline = mService.getPipeline();
+		initNN();
+
 		return true;
 	}
 
@@ -41,6 +48,11 @@ namespace nap
 	std::shared_ptr < dai::node::NeuralNetwork> NeuralNetworkNode::getNN()
 	{
 		return detectionNN;
+	}
+
+	std::shared_ptr < dai::Pipeline > NeuralNetworkNode::getPipelinePointer()
+	{
+		return pipeline;
 	}
 
 	void NeuralNetworkNode::stop()

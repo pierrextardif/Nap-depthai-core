@@ -65,6 +65,8 @@ namespace nap
 
 		glm::vec2 getSizeFrame();
 
+		std::shared_ptr <dai::Pipeline > getPipeline();
+
 
 	protected:
 		virtual void registerObjectCreators(rtti::Factory& factory) override;
@@ -72,6 +74,7 @@ namespace nap
 
 	private:
 
+		dai::Pipeline  pipeline;
 		std::vector< nap::OakFrameRender* > mOakFrames;
 
 	};

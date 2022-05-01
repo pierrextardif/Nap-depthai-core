@@ -42,7 +42,7 @@ namespace nap
 	private :
 		void initDAI();
 
-		dai::Pipeline pipeline;
+		std::shared_ptr < dai::Pipeline > pipeline;
 		dai::Device* device;
 
 

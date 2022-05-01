@@ -63,62 +63,62 @@ namespace nap
 
     bool OakFrameRender::init() {
 
-        std::cout << "init!!" << std::endl;
+        //std::cout << "init!!" << std::endl;
 
-        previewSize = { 256, 256 };
+        //previewSize = { 256, 256 };
 
-        pipeline.setOpenVINOVersion(dai::OpenVINO::VERSION_2021_4);
+        //pipeline.setOpenVINOVersion(dai::OpenVINO::VERSION_2021_4);
 
-        // Define source and output
-        auto camRgb = pipeline.create<dai::node::ColorCamera>();
-        auto xin = pipeline.create<dai::node::XLinkIn>();
-        auto xoutRGB = pipeline.create<dai::node::XLinkOut>();
-        auto nnOut = pipeline.create<dai::node::XLinkOut>();
+        //// Define source and output
+        //auto camRgb = pipeline.create<dai::node::ColorCamera>();
+        //auto xin = pipeline.create<dai::node::XLinkIn>();
+        //auto xoutRGB = pipeline.create<dai::node::XLinkOut>();
+        //auto nnOut = pipeline.create<dai::node::XLinkOut>();
 
-        // neural network node
-        auto detectionNN = pipeline.create<dai::node::NeuralNetwork>();
-        //detectionNN->setBlobPath(nnPath);
-        detectionNN->setNumInferenceThreads(2);
-        detectionNN->input.setBlocking(false);
+        //// neural network node
+        //auto detectionNN = pipeline.create<dai::node::NeuralNetwork>();
+        ////detectionNN->setBlobPath(nnPath);
+        //detectionNN->setNumInferenceThreads(2);
+        //detectionNN->input.setBlocking(false);
 
-        xoutRGB->setStreamName("rgb");
-        xoutRGB->getStreamName();
-        nnOut->setStreamName("segmentation");
+        //xoutRGB->setStreamName("rgb");
+        //xoutRGB->getStreamName();
+        //nnOut->setStreamName("segmentation");
 
-        xin->setStreamName("nn_in");
-        nnOut->setStreamName("segmentation");
+        //xin->setStreamName("nn_in");
+        //nnOut->setStreamName("segmentation");
 
-        // Properties
-        camRgb->setPreviewSize(previewSize.x, previewSize.x);
-        camRgb->setBoardSocket(dai::CameraBoardSocket::RGB);
-        camRgb->setResolution(dai::ColorCameraProperties::SensorResolution::THE_1080_P);
-        camRgb->setInterleaved(false);
-        camRgb->setColorOrder(dai::ColorCameraProperties::ColorOrder::RGB);
-
-
-        xin->setMaxDataSize(300 * 300 * 3);
-        xin->setNumFrames(30);
-
-        camRgb->preview.link(detectionNN->input);
-        detectionNN->passthrough.link(xoutRGB->input);
-
-        // Linking
-        //camRgb->video.link(xoutRGB->input);
-
-        xin->out.link(detectionNN->input);
+        //// Properties
+        //camRgb->setPreviewSize(previewSize.x, previewSize.x);
+        //camRgb->setBoardSocket(dai::CameraBoardSocket::RGB);
+        //camRgb->setResolution(dai::ColorCameraProperties::SensorResolution::THE_1080_P);
+        //camRgb->setInterleaved(false);
+        //camRgb->setColorOrder(dai::ColorCameraProperties::ColorOrder::RGB);
 
 
-        detectionNN->out.link(nnOut->input);
+        //xin->setMaxDataSize(300 * 300 * 3);
+        //xin->setNumFrames(30);
 
-        // Connect to device and start pipeline
-        device = new dai::Device(pipeline);
+        //camRgb->preview.link(detectionNN->input);
+        //detectionNN->passthrough.link(xoutRGB->input);
+
+        //// Linking
+        ////camRgb->video.link(xoutRGB->input);
+
+        //xin->out.link(detectionNN->input);
 
 
-        qRgb = device->getOutputQueue("rgb", 4, false);
-        qNN = device->getOutputQueue("segmentation", 4, false);
-        inDataInQueue = device->getInputQueue("nn_in");
+        //detectionNN->out.link(nnOut->input);
 
-        tensor = std::make_shared<dai::RawBuffer>();
+        //// Connect to device and start pipeline
+        //device = new dai::Device(pipeline);
+
+
+        //qRgb = device->getOutputQueue("rgb", 4, false);
+        //qNN = device->getOutputQueue("segmentation", 4, false);
+        //inDataInQueue = device->getInputQueue("nn_in");
+
+        //tensor = std::make_shared<dai::RawBuffer>();
 
         return true;
 
@@ -144,39 +144,39 @@ namespace nap
     }
 
     void OakFrameRender::updateOakFrame() {
-        if(qRgb){
+        //if(qRgb){
 
 
-            std::shared_ptr<dai::ImgFrame> inRgb = qRgb->tryGet<dai::ImgFrame>();
-            std::shared_ptr<dai::NNData> inDet = qNN->tryGet<dai::NNData>();
+        //    std::shared_ptr<dai::ImgFrame> inRgb = qRgb->tryGet<dai::ImgFrame>();
+        //    std::shared_ptr<dai::NNData> inDet = qNN->tryGet<dai::NNData>();
 
 
-            if (inRgb && inDet && texRGBA != nullptr){
-                cv::Mat frame = inRgb->getCvFrame();
-                toPlanar(frame, tensor->data);
+        //    if (inRgb && inDet && texRGBA != nullptr){
+        //        cv::Mat frame = inRgb->getCvFrame();
+        //        toPlanar(frame, tensor->data);
 
-                cv::cvtColor(frame, *rgbaMat, cv::COLOR_RGB2RGBA);
-                texRGBA->update((uint8_t*)rgbaMat->data, rgbaSurfaceDescriptor);
-                
-                inDataInQueue->send(tensor);
+        //        cv::cvtColor(frame, *rgbaMat, cv::COLOR_RGB2RGBA);
+        //        texRGBA->update((uint8_t*)rgbaMat->data, rgbaSurfaceDescriptor);
+        //        
+        //        inDataInQueue->send(tensor);
 
 
 
-                std::vector<dai::TensorInfo> vecAllLayers = inDet->getAllLayers();
-                if (vecAllLayers.size() > 0) {
+        //        std::vector<dai::TensorInfo> vecAllLayers = inDet->getAllLayers();
+        //        if (vecAllLayers.size() > 0) {
 
-                    std::vector<std::int32_t> layer1 = inDet->getLayerInt32(vecAllLayers[0].name);
-                    std::vector<float> layer2 = inDet->getLayerFp16(vecAllLayers[0].name);
-                    std::vector < uint8_t> layerU = inDet->getFirstLayerUInt8();
-                    if(layer1.size() > 0)
-                        texSegmentation->update((uint8_t*)layer1.data(), segmentationSurfaceDescriptor);
-                }
+        //            std::vector<std::int32_t> layer1 = inDet->getLayerInt32(vecAllLayers[0].name);
+        //            std::vector<float> layer2 = inDet->getLayerFp16(vecAllLayers[0].name);
+        //            std::vector < uint8_t> layerU = inDet->getFirstLayerUInt8();
+        //            if(layer1.size() > 0)
+        //                texSegmentation->update((uint8_t*)layer1.data(), segmentationSurfaceDescriptor);
+        //        }
 
-            }
-            else {
-                texturesCreated = initTexture(inRgb, previewSize);
-            }
-        }
+        //    }
+        //    else {
+        //        texturesCreated = initTexture(inRgb, previewSize);
+        //    }
+        //}
     }
     bool OakFrameRender::initTexture(std::shared_ptr < dai::ImgFrame > imgFrame, glm::vec2 sizeFrameNN)
     {

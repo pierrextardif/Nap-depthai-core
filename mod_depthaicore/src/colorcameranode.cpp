@@ -43,7 +43,8 @@ RTTI_END_CLASS
 
 namespace nap
 {
-	ColorCameraNode::ColorCameraNode(DepthAICoreService& service)
+	ColorCameraNode::ColorCameraNode(DepthAICoreService& service):
+		mService(service)
 	{
 
 	}

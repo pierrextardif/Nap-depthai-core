@@ -28,6 +28,8 @@ namespace nap
         camRgbNode = resource->camRgb.get();
 		detectionNNNode = resource->detectionNN.get();
         previewSize = camRgbNode->getPreviewSize();
+
+        pipeline = detectionNNNode->getPipelinePointer();
         
         initDAI();
 
@@ -44,14 +46,14 @@ namespace nap
 
     void SemanticSegComponentInstance::initDAI()
 	{
+        std::cout << "initDAI" << std::endl;
 
-
-        pipeline.setOpenVINOVersion(dai::OpenVINO::VERSION_2021_4);
+        pipeline->setOpenVINOVersion(dai::OpenVINO::VERSION_2021_4);
 
         // Define source and output
-        auto xin = pipeline.create<dai::node::XLinkIn>();
-        auto xoutRGB = pipeline.create<dai::node::XLinkOut>();
-        auto nnOut = pipeline.create<dai::node::XLinkOut>();
+        auto xin = pipeline->create<dai::node::XLinkIn>();
+        auto xoutRGB = pipeline->create<dai::node::XLinkOut>();
+        auto nnOut = pipeline->create<dai::node::XLinkOut>();
 
 
         xoutRGB->setStreamName("rgb");
@@ -78,7 +80,7 @@ namespace nap
         detectionNNNode->getNN()->out.link(nnOut->input);
 
         // Connect to device and start pipeline
-        device = new dai::Device(pipeline);
+        device = new dai::Device(*pipeline);
 
 
         qRgb = device->getOutputQueue("rgb", 4, false);

@@ -29,9 +29,16 @@ namespace nap
 	
 	void DepthAICoreService::initOak() {
 		
+
 		for (auto* mO : mOakFrames) {
 			mO->init();
 		}
+	}
+
+
+	std::shared_ptr <dai::Pipeline > DepthAICoreService::getPipeline()
+	{
+		return std::make_shared<dai::Pipeline>(pipeline);
 	}
 
 	void DepthAICoreService::getDependentServices(std::vector<rtti::TypeInfo>& dependencies)
