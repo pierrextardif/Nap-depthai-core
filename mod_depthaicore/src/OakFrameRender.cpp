@@ -8,27 +8,8 @@
 #include <rtti/typeinfo.h>
 
 
-RTTI_BEGIN_ENUM(nap::DAINodeType)
-RTTI_ENUM_VALUE(nap::DAINodeType::MonoCamera, "MonoCamera"),
-RTTI_ENUM_VALUE(nap::DAINodeType::ColorCamera, "ColorCamera"),
-RTTI_ENUM_VALUE(nap::DAINodeType::EdgeDetector, "EdgeDetector"),
-RTTI_ENUM_VALUE(nap::DAINodeType::ImageManip, "ImageManip"),
-RTTI_ENUM_VALUE(nap::DAINodeType::FeatureTracker, "FeatureTracker"),
-RTTI_ENUM_VALUE(nap::DAINodeType::ObjectTracker, "ObjectTracker"),
-RTTI_ENUM_VALUE(nap::DAINodeType::XLinkIn, "XLinkIn"),
-RTTI_ENUM_VALUE(nap::DAINodeType::XLinkOut, "XLinkOut"),
-RTTI_ENUM_VALUE(nap::DAINodeType::NeuralNetwork, "NeuralNetwork"),
-RTTI_ENUM_VALUE(nap::DAINodeType::MobileNetDetectionNetwork, "MobileNetDetectionNetwork"),
-RTTI_ENUM_VALUE(nap::DAINodeType::StereoDepth, "StereoDepth"),
-RTTI_ENUM_VALUE(nap::DAINodeType::VideoEncoder, "VideoEncoder"),
-RTTI_ENUM_VALUE(nap::DAINodeType::IMU, "IMU")
-RTTI_END_ENUM
-
-
-
 // nap::rendervideototexturecomponentInstance run time class definition 
 RTTI_BEGIN_CLASS_NO_DEFAULT_CONSTRUCTOR(nap::OakFrameRender)
-    RTTI_PROPERTY("node Type", &nap::OakFrameRender::nodeType, nap::rtti::EPropertyMetaData::Required)
 RTTI_END_CLASS
 
 //////////////////////////////////////////////////////////////////////////
@@ -180,25 +161,15 @@ namespace nap
         return *texSegmentation;
     }
 
+    glm::vec2 OakFrameRender::getOakFrameSize() {
 
-    std::vector<uint8_t> OakFrameRender::createUVTexture(bool vTex) {
-        std::vector < uint8> uv_data;
-
-
-        for (int i = 0; i < frameSize.x; i++) {
-            for (int j = 0; j < frameSize.y; j++) {
-                
-                uint8 uvCoord = i;
-                if (vTex)uvCoord = j;
-                uv_data.push_back(uvCoord);
-            }
-        }
-
-        return uv_data;
-
-
+        return frameSize;
     }
 
+    bool OakFrameRender::firstUpdateTensorData()
+    {
+        return tensorData;
+    }
 
     void OakFrameRender::checkCvMatType(cv::Mat texColor) {
         int inttype = texColor.type();
@@ -219,16 +190,5 @@ namespace nap
         r += "C";
         r += (chans + '0');
         std::cout << "Mat is of type " << r << " and should be accessed with " << a << std::endl;
-    }
-
-
-    glm::vec2 OakFrameRender::getOakFrameSize() {
-
-        return frameSize;
-    }
-
-    bool OakFrameRender::firstUpdateTensorData()
-    {
-        return tensorData;
     }
 }

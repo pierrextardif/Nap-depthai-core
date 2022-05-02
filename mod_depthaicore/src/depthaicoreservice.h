@@ -12,6 +12,26 @@ using namespace nap;
 
 namespace nap
 {
+
+
+	enum class DAINodeType : int
+	{
+		MonoCamera = 1,
+		ColorCamera = 2,
+		EdgeDetector = 3,
+		ImageManip = 10,
+		FeatureTracker = 11,
+		ObjectTracker = 12,
+		XLinkIn = 20,
+		XLinkOut = 21,
+		NeuralNetwork = 30,
+		MobileNetDetectionNetwork = 31,
+		StereoDepth = 40,
+		VideoEncoder = 41,
+		IMU = 50,
+
+	};
+
 	class NAPAPI DepthAICoreService : public Service
 	{
 		friend class OakFrameRender;

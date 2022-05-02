@@ -17,25 +17,6 @@ namespace nap
 	class DepthAICoreService;
 
 
-	enum class DAINodeType : int
-	{
-		MonoCamera = 1,
-		ColorCamera = 2,
-		EdgeDetector = 3,
-		ImageManip = 10,
-		FeatureTracker = 11,
-		ObjectTracker = 12,
-		XLinkIn = 20,
-		XLinkOut = 21,
-		NeuralNetwork = 30,
-		MobileNetDetectionNetwork = 31,
-		StereoDepth = 40,
-		VideoEncoder = 41,
-		IMU = 50,
-
-	};
-
-
 	
 	class NAPAPI OakFrameRender : public Device
 	{
@@ -48,8 +29,6 @@ namespace nap
 		OakFrameRender(DepthAICoreService& service);
 		virtual bool start(utility::ErrorState& errorState) override;
 		virtual void stop() override;
-
-		DAINodeType nodeType;
 
 		Texture2D& getRGBATexture();
 		Texture2D& getSegmentationTexture();
@@ -70,9 +49,7 @@ namespace nap
 	private :
 
 		DepthAICoreService& mService;
-		dai::Pipeline pipeline;
 
-		dai::Device* device;
 
 		void updateOakFrame();
 		bool init();
@@ -83,29 +60,16 @@ namespace nap
 		std::unique_ptr<Texture2D> texSegmentation;
 		SurfaceDescriptor rgbaSurfaceDescriptor, segmentationSurfaceDescriptor;
 
-		std::shared_ptr<dai::DataOutputQueue> video = nullptr;
-		std::shared_ptr<dai::DataOutputQueue> qRgb = nullptr;
-		std::shared_ptr<dai::DataOutputQueue> qNN = nullptr;
-		std::shared_ptr<dai::DataInputQueue> inDataInQueue = nullptr;
-
-		std::shared_ptr<dai::RawBuffer> tensor = nullptr;
-
 		void clearTexture();
 
 		bool texturesCreated;
 		bool tensorData;
 		glm::vec2 frameSize;
-		glm::vec2 previewSize;
-		int pitch;
-
-		
-
 
 
 		cv::Mat* rgbaMat;
 
 		// helper
-		std::vector<uint8_t> createUVTexture(bool vTex);
 		void checkCvMatType(cv::Mat texColor);
 
 	};
