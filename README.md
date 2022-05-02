@@ -14,6 +14,10 @@ Download [Nap Framework version 0.5.0](https://www.napframework.com/) and check 
 
 <br>
 
+Download [Depthai-core](https://github.com/luxonis/depthai-core) and compile it.
+
+<br>
+
 1) Copy the [Semantic Segmentation Example](./depthaicoresemanticsegexample) folder into your `Nap_Install/projects/` folder.
 2) Copy the [DepthAi Core lib](./mod_depthaicore) into your  `Nap_Install/user_modules/` folder.
 
@@ -62,3 +66,16 @@ Once opened, find the NeuralNetwork Node and make sure that its path points to t
 
 Save it, the run executable.
 
+<br>
+
+![.](./Assets/imgs/Kicking.gif)
+
+
+
+
+
+## Known Issues
+
+<br>
+
+[Cmake copy](./mod_depthaicore/module_extra.cmake) isn't working yet, so you will have to copy the openCV dll (`opencv_world455d.dll` / `opencv_world455.dll`) manually into the `bin/Debug` / `bin/Release` folder.
