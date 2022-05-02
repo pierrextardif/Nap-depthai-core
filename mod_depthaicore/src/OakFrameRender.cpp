@@ -41,6 +41,7 @@ namespace nap
         mService(service) {
 
         texturesCreated = false;
+        tensorData = false;
     }
 
     bool OakFrameRender::start(utility::ErrorState& errorState) {
@@ -72,6 +73,9 @@ namespace nap
                 data[x + y * bgr.cols + 2 * bgr.rows * bgr.cols] = p[2];
             }
         }
+
+        // first pass done 
+        tensorData = true;
     }
 
     void OakFrameRender::updateSamticSeg(cv::Mat* frame, std::shared_ptr<dai::RawBuffer> tensor, std::shared_ptr<dai::NNData> inDet)
@@ -221,5 +225,10 @@ namespace nap
     glm::vec2 OakFrameRender::getOakFrameSize() {
 
         return frameSize;
+    }
+
+    bool OakFrameRender::firstUpdateTensorData()
+    {
+        return tensorData;
     }
 }

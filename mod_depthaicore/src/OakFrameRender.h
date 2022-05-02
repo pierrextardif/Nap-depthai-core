@@ -57,6 +57,7 @@ namespace nap
 
 		void initTextures(glm::vec2 imgFrame, glm::vec2 sizeFrameNN = { -1, -1 });
 		bool texturesInitDone();
+		bool firstUpdateTensorData();
 
 		glm::vec2 getOakFrameSize();
 
@@ -92,6 +93,7 @@ namespace nap
 		void clearTexture();
 
 		bool texturesCreated;
+		bool tensorData;
 		glm::vec2 frameSize;
 		glm::vec2 previewSize;
 		int pitch;

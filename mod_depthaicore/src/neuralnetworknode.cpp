@@ -56,11 +56,4 @@ namespace nap
 	{
 
 	}
-
-
-	void NeuralNetworkNode::update(double deltaTime)
-	{
-	}
-
-
 }

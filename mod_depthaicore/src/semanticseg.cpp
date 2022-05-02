@@ -101,7 +101,7 @@ namespace nap
 
             if (inRgb && inDet && mOakFrame->texturesInitDone()) {
                 
-                inDataInQueue->send(tensor);
+                if(mOakFrame->firstUpdateTensorData())inDataInQueue->send(tensor);
                 cv::Mat frame = inRgb->getCvFrame();
 
                 mOakFrame->updateSamticSeg(&frame, tensor, inDet);

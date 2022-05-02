@@ -33,7 +33,6 @@ namespace nap
 		std::shared_ptr < dai::node::NeuralNetwork> getNN();
 		std::shared_ptr < dai::Pipeline > getPipelinePointer();
 
-		void update(double deltaTime);
 		std::string nnPath = "C:/Users/pierr/Documents/DEV/NAP/NAP-0.5.0-Win64-x86_64/user_modules/mod_depthaicore/data/nn/deeplabv3p_person_6_shaves.blob";
 		int inferenceThreads = 1;
 		bool blocking = false;
