@@ -63,10 +63,10 @@ namespace nap
 		
 		// Properties
 		cam->setPreviewSize(previewSize, previewSize);
-		cam->setBoardSocket(dai::CameraBoardSocket::RGB);
-		cam->setResolution(dai::ColorCameraProperties::SensorResolution::THE_1080_P);
-		cam->setInterleaved(false);
-		cam->setColorOrder(dai::ColorCameraProperties::ColorOrder::RGB);
+		cam->setBoardSocket(cameraBoardSocket);
+		cam->setResolution(sensorResolution);
+		cam->setInterleaved(interleaved);
+		cam->setColorOrder(colorOrder);
 	}
 
 

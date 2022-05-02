@@ -79,7 +79,7 @@ namespace nap
         detectionNNNode->getNN()->out.link(nnOut->input);
 
         // Connect to device and start pipeline
-        device = new dai::Device(*pipeline);
+        device = new dai::Device(*pipeline, dai::UsbSpeed::SUPER);
 
 
         qRgb = device->getOutputQueue("rgb", 4, false);
