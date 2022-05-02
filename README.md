@@ -1,7 +1,15 @@
 # Nap-depthai-core
-DepthAI-Core Oak-D Lite in Nap Frameworks (Windows)
+[DepthAI-Core](https://github.com/luxonis/depthai-core) [Oak-D Lite](https://docs.luxonis.com/projects/hardware/en/latest/pages/DM9095.html) in [Nap Frameworks](https://www.napframework.com/) (Windows)
 
 <br>
+
+Semantic Segmentation example:
+
+<br>
+
+![.](./Assets/imgs/Kicking.gif)
+
+
 <br>
 
 ## Getting started
@@ -65,13 +73,6 @@ Once opened, find the NeuralNetwork Node and make sure that its path points to t
 <br>
 
 Save it, the run executable.
-
-<br>
-
-![.](./Assets/imgs/Kicking.gif)
-
-
-
 
 
 ## Known Issues
