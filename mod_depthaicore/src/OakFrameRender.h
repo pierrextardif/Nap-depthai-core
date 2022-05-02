@@ -49,19 +49,19 @@ namespace nap
 		virtual bool start(utility::ErrorState& errorState) override;
 		virtual void stop() override;
 
-
-		void update(double deltaTime);
-
-		//DAIIputOutput type = DAIIputOutput::InputLink;
 		DAINodeType nodeType;
 
 		Texture2D& getRGBATexture();
 		Texture2D& getSegmentationTexture();
 
-		bool textureInit();
+
+		void initTextures(glm::vec2 imgFrame, glm::vec2 sizeFrameNN = { -1, -1 });
+		bool texturesInitDone();
 
 		glm::vec2 getOakFrameSize();
 
+		void toPlanar(cv::Mat& bgr, std::vector<std::uint8_t>& data);
+		void updateSamticSeg(cv::Mat* frame, std::shared_ptr<dai::RawBuffer> tensor, std::shared_ptr<dai::NNData> inDet);
 
 		DepthAICoreService& getService(); 
 
@@ -76,7 +76,7 @@ namespace nap
 		void updateOakFrame();
 		bool init();
 
-		bool initTexture(std::shared_ptr < dai::ImgFrame > imgFrame, glm::vec2 sizeFrameNN);
+		bool initTexture(glm::vec2 imgFrame, glm::vec2 sizeFrameNN);
 
 		std::unique_ptr<Texture2D> texRGBA;
 		std::unique_ptr<Texture2D> texSegmentation;

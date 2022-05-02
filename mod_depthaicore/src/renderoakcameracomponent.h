@@ -47,9 +47,9 @@ namespace nap
 		bool setContentSampler();
 		void draw();
 
-		nap::Texture2D& getOutputTexture() {
-			return mTarget.getColorTexture();
-		}
+		nap::Texture2D& getOutputTexture();
+		glm::vec2 getOakFrameSize();
+
 	private :
 		OakFrameRender*				mOakFrame = nullptr;
 		RenderTexture2D*			mOutputTexture = nullptr;						///< Texture currently bound by target

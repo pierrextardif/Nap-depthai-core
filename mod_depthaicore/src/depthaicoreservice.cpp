@@ -22,17 +22,6 @@ namespace nap
 
 	void DepthAICoreService::update(double deltaTime)
 	{
-		for (auto* mO : mOakFrames) {
-			mO->update(deltaTime);
-		}
-	}
-	
-	void DepthAICoreService::initOak() {
-		
-
-		for (auto* mO : mOakFrames) {
-			mO->init();
-		}
 	}
 
 
@@ -50,35 +39,11 @@ namespace nap
 	{
 	}
 
-
-	glm::vec2 DepthAICoreService::getSizeFrame()
-	{
-
-		return mOakFrames.size() > 0 ? mOakFrames[0]->getOakFrameSize() : glm::vec2(1920, 1080);
-	}
-
-
-
 	void DepthAICoreService::registerObjectCreators(rtti::Factory& factory)
 	{
 		factory.addObjectCreator(std::make_unique<OakFrameRenderObjectCreator>(*this));
 		factory.addObjectCreator(std::make_unique<ColorCameraNodeObjectCreator>(*this));
 		factory.addObjectCreator(std::make_unique<NeuralNetworkNodeObjectCreator>(*this));
 		//factory.addObjectCreator(std::make_unique<SemanticSegmentationObjectCreator>(*this));
-	}
-
-	void DepthAICoreService::registerOakFrame(nap::OakFrameRender& nFrame)
-	{
-		mOakFrames.emplace_back(&nFrame);
-	}
-
-	void DepthAICoreService::removeOakFrameRender(nap::OakFrameRender& nFrame)
-	{
-		auto found_it = std::find_if(mOakFrames.begin(), mOakFrames.end(), [&](const auto& it)
-			{
-				return it == &nFrame;
-			});
-		assert(found_it != mOakFrames.end());
-		mOakFrames.erase(found_it);
 	}
 }

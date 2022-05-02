@@ -41,13 +41,9 @@ namespace nap
         mService(service) {
 
         texturesCreated = false;
-        //std::cout << "creation of the oakframerenderer done" << std::endl;
     }
 
     bool OakFrameRender::start(utility::ErrorState& errorState) {
-
-        mService.registerOakFrame(*this);
-
 
         return true;
     }
@@ -62,75 +58,10 @@ namespace nap
 
 
     bool OakFrameRender::init() {
-
-        //std::cout << "init!!" << std::endl;
-
-        //previewSize = { 256, 256 };
-
-        //pipeline.setOpenVINOVersion(dai::OpenVINO::VERSION_2021_4);
-
-        //// Define source and output
-        //auto camRgb = pipeline.create<dai::node::ColorCamera>();
-        //auto xin = pipeline.create<dai::node::XLinkIn>();
-        //auto xoutRGB = pipeline.create<dai::node::XLinkOut>();
-        //auto nnOut = pipeline.create<dai::node::XLinkOut>();
-
-        //// neural network node
-        //auto detectionNN = pipeline.create<dai::node::NeuralNetwork>();
-        ////detectionNN->setBlobPath(nnPath);
-        //detectionNN->setNumInferenceThreads(2);
-        //detectionNN->input.setBlocking(false);
-
-        //xoutRGB->setStreamName("rgb");
-        //xoutRGB->getStreamName();
-        //nnOut->setStreamName("segmentation");
-
-        //xin->setStreamName("nn_in");
-        //nnOut->setStreamName("segmentation");
-
-        //// Properties
-        //camRgb->setPreviewSize(previewSize.x, previewSize.x);
-        //camRgb->setBoardSocket(dai::CameraBoardSocket::RGB);
-        //camRgb->setResolution(dai::ColorCameraProperties::SensorResolution::THE_1080_P);
-        //camRgb->setInterleaved(false);
-        //camRgb->setColorOrder(dai::ColorCameraProperties::ColorOrder::RGB);
-
-
-        //xin->setMaxDataSize(300 * 300 * 3);
-        //xin->setNumFrames(30);
-
-        //camRgb->preview.link(detectionNN->input);
-        //detectionNN->passthrough.link(xoutRGB->input);
-
-        //// Linking
-        ////camRgb->video.link(xoutRGB->input);
-
-        //xin->out.link(detectionNN->input);
-
-
-        //detectionNN->out.link(nnOut->input);
-
-        //// Connect to device and start pipeline
-        //device = new dai::Device(pipeline);
-
-
-        //qRgb = device->getOutputQueue("rgb", 4, false);
-        //qNN = device->getOutputQueue("segmentation", 4, false);
-        //inDataInQueue = device->getInputQueue("nn_in");
-
-        //tensor = std::make_shared<dai::RawBuffer>();
-
         return true;
-
     }
-
-
-    void OakFrameRender::update(double deltatime) {
-        updateOakFrame();
-    }
-
     // from utilities of depthai-core/examples/utilities
-    void toPlanar(cv::Mat& bgr, std::vector<std::uint8_t>& data) {
+    void OakFrameRender::toPlanar(cv::Mat& bgr, std::vector<std::uint8_t>& data) {
 
         data.resize(bgr.cols * bgr.rows * 3);
         for (int y = 0; y < bgr.rows; y++) {
@@ -143,62 +74,57 @@ namespace nap
         }
     }
 
-    void OakFrameRender::updateOakFrame() {
-        //if(qRgb){
+    void OakFrameRender::updateSamticSeg(cv::Mat* frame, std::shared_ptr<dai::RawBuffer> tensor, std::shared_ptr<dai::NNData> inDet)
+    {
+
+        toPlanar(*frame, tensor->data);
+
+        cv::cvtColor(*frame, *rgbaMat, cv::COLOR_RGB2RGBA);
+        texRGBA->update((uint8_t*)rgbaMat->data, rgbaSurfaceDescriptor);
 
 
-        //    std::shared_ptr<dai::ImgFrame> inRgb = qRgb->tryGet<dai::ImgFrame>();
-        //    std::shared_ptr<dai::NNData> inDet = qNN->tryGet<dai::NNData>();
+        std::vector<dai::TensorInfo> vecAllLayers = inDet->getAllLayers();
+        if (vecAllLayers.size() > 0) {
 
-
-        //    if (inRgb && inDet && texRGBA != nullptr){
-        //        cv::Mat frame = inRgb->getCvFrame();
-        //        toPlanar(frame, tensor->data);
-
-        //        cv::cvtColor(frame, *rgbaMat, cv::COLOR_RGB2RGBA);
-        //        texRGBA->update((uint8_t*)rgbaMat->data, rgbaSurfaceDescriptor);
-        //        
-        //        inDataInQueue->send(tensor);
-
-
-
-        //        std::vector<dai::TensorInfo> vecAllLayers = inDet->getAllLayers();
-        //        if (vecAllLayers.size() > 0) {
-
-        //            std::vector<std::int32_t> layer1 = inDet->getLayerInt32(vecAllLayers[0].name);
-        //            std::vector<float> layer2 = inDet->getLayerFp16(vecAllLayers[0].name);
-        //            std::vector < uint8_t> layerU = inDet->getFirstLayerUInt8();
-        //            if(layer1.size() > 0)
-        //                texSegmentation->update((uint8_t*)layer1.data(), segmentationSurfaceDescriptor);
-        //        }
-
-        //    }
-        //    else {
-        //        texturesCreated = initTexture(inRgb, previewSize);
-        //    }
-        //}
+            std::vector<std::int32_t> layer1 = inDet->getLayerInt32(vecAllLayers[0].name);
+            std::vector<float> layer2 = inDet->getLayerFp16(vecAllLayers[0].name);
+            std::vector < uint8_t> layerU = inDet->getFirstLayerUInt8();
+            if (layer1.size() > 0)
+                texSegmentation->update((uint8_t*)layer1.data(), segmentationSurfaceDescriptor);
+        }
     }
-    bool OakFrameRender::initTexture(std::shared_ptr < dai::ImgFrame > imgFrame, glm::vec2 sizeFrameNN)
+
+    bool OakFrameRender::texturesInitDone() {
+
+        return texturesCreated;
+    }
+
+
+    void OakFrameRender::initTextures(glm::vec2 imgFrame, glm::vec2 sizeFrameNN)
+    {
+        texturesCreated = initTexture(imgFrame, sizeFrameNN);
+    }
+
+    bool OakFrameRender::initTexture(glm::vec2 imgFrame, glm::vec2 sizeFrameNN)
     {
         if (texturesCreated) {
             return texturesCreated;
-        }
-        else if(imgFrame){
+        }else{
             utility::ErrorState error;
-            if (imgFrame->getWidth()!= 0 && imgFrame->getHeight()!= 0) {
 
-                frameSize = { imgFrame->getWidth(), imgFrame->getHeight() };
+            frameSize = imgFrame;
                 
-                rgbaSurfaceDescriptor.mWidth = frameSize.x;
-                rgbaSurfaceDescriptor.mHeight = frameSize.y;
-                rgbaSurfaceDescriptor.mColorSpace = EColorSpace::Linear;
-                rgbaSurfaceDescriptor.mDataType = ESurfaceDataType::BYTE;
-                rgbaSurfaceDescriptor.mChannels = ESurfaceChannels::BGRA;
-                texRGBA = std::make_unique<Texture2D>(mService.getCore());
-                texRGBA->mUsage = ETextureUsage::DynamicWrite;
-                if (!texRGBA->init(rgbaSurfaceDescriptor, false, 0, error))
-                    return false;
+            rgbaSurfaceDescriptor.mWidth = frameSize.x;
+            rgbaSurfaceDescriptor.mHeight = frameSize.y;
+            rgbaSurfaceDescriptor.mColorSpace = EColorSpace::Linear;
+            rgbaSurfaceDescriptor.mDataType = ESurfaceDataType::BYTE;
+            rgbaSurfaceDescriptor.mChannels = ESurfaceChannels::BGRA;
+            texRGBA = std::make_unique<Texture2D>(mService.getCore());
+            texRGBA->mUsage = ETextureUsage::DynamicWrite;
+            if (!texRGBA->init(rgbaSurfaceDescriptor, false, 0, error))
+                return false;
 
+            if (sizeFrameNN.x != -1 && sizeFrameNN.y != -1) {
                 segmentationSurfaceDescriptor.mWidth = sizeFrameNN.x;
                 segmentationSurfaceDescriptor.mHeight = sizeFrameNN.y;
                 segmentationSurfaceDescriptor.mColorSpace = EColorSpace::Linear;
@@ -208,22 +134,18 @@ namespace nap
                 texSegmentation->mUsage = ETextureUsage::DynamicWrite;
                 if (!texSegmentation->init(segmentationSurfaceDescriptor, false, 0, error))
                     return false;
-
-
-                const size_t sizeFrame = static_cast<const size_t>(rgbaSurfaceDescriptor.getSizeInBytes());
-                rgbaMat = new cv::Mat(frameSize.x, frameSize.y, CV_8UC4);
-                *rgbaMat = cv::Scalar::all(255);
-
-
-                clearTexture();
-
-                texturesCreated = true;
-                std::cout << "texture created" << std::endl;
-
             }
-        }
-        else {
-            return false;
+
+
+            const size_t sizeFrame = static_cast<const size_t>(rgbaSurfaceDescriptor.getSizeInBytes());
+            rgbaMat = new cv::Mat(frameSize.x, frameSize.y, CV_8UC4);
+            *rgbaMat = cv::Scalar::all(255);
+
+
+            clearTexture();
+
+            texturesCreated = true;
+
         }
     }
 
@@ -272,12 +194,6 @@ namespace nap
 
 
     }
-
-    bool OakFrameRender::textureInit() {
-
-        return texturesCreated;
-    }
-
 
 
     void OakFrameRender::checkCvMatType(cv::Mat texColor) {

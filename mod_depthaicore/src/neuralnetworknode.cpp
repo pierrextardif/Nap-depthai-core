@@ -21,13 +21,10 @@ namespace nap
 	NeuralNetworkNode::NeuralNetworkNode(DepthAICoreService& service):
 		mService(service)
 	{
-		std::cout << "creation of the NeuralNetWork node" << std::endl;
-
 	}
 
-	bool NeuralNetworkNode::start(utility::ErrorState& errorState) {
-
-		std::cout << "starting the NeuralNetWork node" << std::endl;
+	bool NeuralNetworkNode::start(utility::ErrorState& errorState) 
+	{
 		pipeline = mService.getPipeline();
 		initNN();
 

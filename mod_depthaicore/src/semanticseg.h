@@ -8,6 +8,7 @@
 #include "depthai/depthai.hpp"
 #include <colorcameranode.h>
 #include <neuralnetworknode.h>
+#include <oakframerender.h>
 
 using namespace nap;
 
@@ -25,8 +26,9 @@ namespace nap
 
 	public:
 		
-		ResourcePtr < ColorCameraNode > camRgb;
-		ResourcePtr < NeuralNetworkNode > detectionNN;
+		ResourcePtr < ColorCameraNode >		camRgb;
+		ResourcePtr < NeuralNetworkNode >	detectionNN;
+		ResourcePtr < OakFrameRender >		mOakFrame;
 	};
 
 	class NAPAPI SemanticSegComponentInstance : public ComponentInstance
@@ -37,6 +39,7 @@ namespace nap
 			ComponentInstance(entity, resource) { }
 
 		virtual bool init(utility::ErrorState& errorState) override;
+		void update(double deltaTime);
 
 		glm::vec2 getSizeNN();
 	private :
@@ -46,15 +49,15 @@ namespace nap
 		dai::Device* device;
 
 
-		std::shared_ptr<dai::DataOutputQueue> qRgb = nullptr;
-		std::shared_ptr<dai::DataOutputQueue> qNN = nullptr;
-		std::shared_ptr<dai::DataInputQueue> inDataInQueue = nullptr;
-
-		std::shared_ptr<dai::RawBuffer> tensor = nullptr;
+		std::shared_ptr<dai::DataOutputQueue>		qRgb = nullptr;
+		std::shared_ptr<dai::DataOutputQueue>		qNN = nullptr;
+		std::shared_ptr<dai::DataInputQueue>		inDataInQueue = nullptr;
+		std::shared_ptr<dai::RawBuffer>				tensor = nullptr;
 
 		glm::vec2 previewSize;
 		ColorCameraNode* camRgbNode = nullptr;
 		NeuralNetworkNode* detectionNNNode = nullptr;
+		OakFrameRender* mOakFrame = nullptr;
 	};
 
 }

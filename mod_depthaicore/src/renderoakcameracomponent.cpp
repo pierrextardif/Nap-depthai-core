@@ -227,7 +227,7 @@ namespace nap
 
 		if (mOakFrame != nullptr) {
 
-			if (mOakFrame->textureInit()) {
+			if (mOakFrame->texturesInitDone()) {
 				mRGBASampler->setTexture(mOakFrame->getRGBATexture());
 				mSemanticSegSampler->setTexture(mOakFrame->getSegmentationTexture());
 				return true;
@@ -238,6 +238,17 @@ namespace nap
 
 		}
 		return false;
+	}
+
+	nap::Texture2D& RenderOakCameraComponentInstance::getOutputTexture() 
+	{
+		return mTarget.getColorTexture();
+	}
+
+
+	glm::vec2  RenderOakCameraComponentInstance::getOakFrameSize()
+	{
+		return (mOakFrame != nullptr) ? mOakFrame->getOakFrameSize() : glm::vec2(1920, 1080);
 	}
 
 

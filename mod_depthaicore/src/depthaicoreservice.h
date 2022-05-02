@@ -36,8 +36,6 @@ namespace nap
 		 */
 		virtual bool init(nap::utility::ErrorState& errorState) override;
 
-
-		void initOak();
 		/**
 		 * Invoked by core in the app loop. Update order depends on service dependency
 		 * This call is invoked after the resource manager has loaded any file changes but before
@@ -52,18 +50,6 @@ namespace nap
 		 * When service B depends on A, Service B is shutdown before A
 		 */
 		virtual void shutdown() override;
-		/**
-		* Registers a frame renderer with the service
-		*/
-		void registerOakFrame(nap::OakFrameRender& nFrame);
-
-
-		/**
-		* Removes a frame renderer from the service
-		*/
-		void removeOakFrameRender(nap::OakFrameRender& nFrame);
-
-		glm::vec2 getSizeFrame();
 
 		std::shared_ptr <dai::Pipeline > getPipeline();
 
@@ -75,7 +61,6 @@ namespace nap
 	private:
 
 		dai::Pipeline  pipeline;
-		std::vector< nap::OakFrameRender* > mOakFrames;
 
 	};
 }

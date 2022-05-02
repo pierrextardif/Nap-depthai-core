@@ -46,13 +46,16 @@ namespace nap
 		glm::vec2 getPreviewSize() {
 			return { cam->getPreviewWidth(), cam->getPreviewHeight() };
 		}
+
 	private:
 
 		DepthAICoreService& mService;
 
-		dai::Pipeline pipeline;
+		std::shared_ptr < dai::Pipeline > pipeline;
+
 		std::shared_ptr < dai::node::ColorCamera > cam;
 
+		void initCC();
 
 	};
 

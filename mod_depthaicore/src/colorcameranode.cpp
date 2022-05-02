@@ -46,6 +46,7 @@ namespace nap
 	ColorCameraNode::ColorCameraNode(DepthAICoreService& service):
 		mService(service)
 	{
+		pipeline = mService.getPipeline();
 
 	}
 
@@ -54,8 +55,25 @@ namespace nap
 		return cam;
 	}
 
+	void ColorCameraNode::initCC()
+	{
+
+
+		cam = pipeline->create<dai::node::ColorCamera>();
+		
+		// Properties
+		cam->setPreviewSize(previewSize, previewSize);
+		cam->setBoardSocket(dai::CameraBoardSocket::RGB);
+		cam->setResolution(dai::ColorCameraProperties::SensorResolution::THE_1080_P);
+		cam->setInterleaved(false);
+		cam->setColorOrder(dai::ColorCameraProperties::ColorOrder::RGB);
+	}
+
+
 
 	bool ColorCameraNode::start(utility::ErrorState& errorState) {
+		
+		initCC();
 		return true;
 	}
 

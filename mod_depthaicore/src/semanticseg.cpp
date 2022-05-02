@@ -7,7 +7,8 @@
 
 RTTI_BEGIN_CLASS(nap::SemanticSegComponent)
 RTTI_PROPERTY("color Cam Node", &nap::SemanticSegComponent::camRgb, nap::rtti::EPropertyMetaData::Required);
-RTTI_PROPERTY("Nueral Network Node", &nap::SemanticSegComponent::detectionNN, nap::rtti::EPropertyMetaData::Required);
+RTTI_PROPERTY("Neural Network Node", &nap::SemanticSegComponent::detectionNN, nap::rtti::EPropertyMetaData::Required);
+RTTI_PROPERTY("OAK frame", &nap::SemanticSegComponent::mOakFrame, nap::rtti::EPropertyMetaData::Required);
 RTTI_END_CLASS
 
 
@@ -27,6 +28,8 @@ namespace nap
         nap::SemanticSegComponent* resource = getComponent<nap::SemanticSegComponent>();
         camRgbNode = resource->camRgb.get();
 		detectionNNNode = resource->detectionNN.get();
+        mOakFrame = resource->mOakFrame.get();
+
         previewSize = camRgbNode->getPreviewSize();
 
         pipeline = detectionNNNode->getPipelinePointer();
@@ -46,7 +49,6 @@ namespace nap
 
     void SemanticSegComponentInstance::initDAI()
 	{
-        std::cout << "initDAI" << std::endl;
 
         pipeline->setOpenVINOVersion(dai::OpenVINO::VERSION_2021_4);
 
@@ -57,9 +59,6 @@ namespace nap
 
 
         xoutRGB->setStreamName("rgb");
-        xoutRGB->getStreamName();
-        nnOut->setStreamName("segmentation");
-
         xin->setStreamName("nn_in");
         nnOut->setStreamName("segmentation");
 
@@ -89,5 +88,34 @@ namespace nap
 
         tensor = std::make_shared<dai::RawBuffer>();
 	}
+
+    void SemanticSegComponentInstance::update(double deltaTime)
+    {
+
+        if (qRgb) {
+
+
+            std::shared_ptr<dai::ImgFrame> inRgb = qRgb->tryGet<dai::ImgFrame>();
+            std::shared_ptr<dai::NNData> inDet = qNN->tryGet<dai::NNData>();
+
+
+            if (inRgb && inDet && mOakFrame->texturesInitDone()) {
+                
+                inDataInQueue->send(tensor);
+                cv::Mat frame = inRgb->getCvFrame();
+
+                mOakFrame->updateSamticSeg(&frame, tensor, inDet);
+
+            }
+            else 
+            {
+                if (inRgb && inRgb->getWidth() != 0 && inRgb->getHeight() != 0) {
+                    mOakFrame->initTextures(glm::vec2( inRgb->getWidth(), inRgb->getHeight() ), previewSize);
+                }
+            }
+        }
+
+    }
+
 
 }
