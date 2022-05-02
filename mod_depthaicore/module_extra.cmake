@@ -1,8 +1,8 @@
 
 
 set(OpenCV_DIR "C:\\dev\\opencv\\opencv\\build")
-find_package(OpenCV REQUIRED)
 set(depthai_DIR "C:\\Users\\pierr\\Documents\\DEV\\DEPTHAI_DEV\\build_2")
+find_package(OpenCV REQUIRED)
 find_package(depthai CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} depthai::opencv ${OpenCV_LIBS})
 
