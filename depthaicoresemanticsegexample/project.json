@@ -1,0 +1,16 @@
+{
+    "Type": "nap::ProjectInfo",
+    "mID": "ProjectInfo",
+    "Title": "DepthaiCoreSemanticSegExample",
+    "Version": "0.1.0",
+    "RequiredModules": [
+        "mod_napapp",
+        "mod_napcameracontrol",
+        "mod_napparametergui",
+        "mod_depthaicore",
+        "mod_depthaicoresemanticsegexample"
+    ],
+    "Data": "data/objects.json",
+    "ServiceConfig": "",
+    "PathMapping": "cache/path_mapping.json"
+}

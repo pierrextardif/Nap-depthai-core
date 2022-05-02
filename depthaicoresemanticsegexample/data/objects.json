@@ -1,0 +1,311 @@
+{
+    "Objects": [
+        {
+            "Type": "nap::ColorCameraNode",
+            "mID": "ColorCameraNode_4e22ea5d",
+            "preview Size": 256,
+            "cam board socket": "RGB",
+            "sensor resolution": "1080_P",
+            "interleaved": false,
+            "Color order": "RGB"
+        },
+        {
+            "Type": "nap::Entity",
+            "mID": "BackgroundEntity",
+            "Components": [
+                {
+                    "Type": "nap::RenderableMeshComponent",
+                    "mID": "nap::RenderableMeshComponent_27c16a0c",
+                    "Visible": true,
+                    "Mesh": "BackgroundMesh",
+                    "MaterialInstance": {
+                        "Uniforms": [],
+                        "Samplers": [
+                            {
+                                "Type": "nap::Sampler2D",
+                                "mID": "Sampler2D_baee4d29",
+                                "Name": "textureOAK",
+                                "MinFilter": "Linear",
+                                "MaxFilter": "Linear",
+                                "MipMapMode": "Linear",
+                                "AddressModeVertical": "ClampToEdge",
+                                "AddressModeHorizontal": "ClampToEdge",
+                                "MaxLodLevel": 1000,
+                                "AnisotropicSamples": "Default",
+                                "Texture": "OakRenderTexture"
+                            }
+                        ],
+                        "Buffers": [],
+                        "Material": "BackGroundMaterial",
+                        "BlendMode": "NotSet",
+                        "DepthMode": "NotSet"
+                    },
+                    "LineWidth": 1.0,
+                    "ClipRect": {
+                        "Min": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "Max": {
+                            "x": 0.0,
+                            "y": 0.0
+                        }
+                    }
+                },
+                {
+                    "Type": "nap::TransformComponent",
+                    "mID": "nap::TransformComponent_2d97f867",
+                    "Properties": {
+                        "Translate": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "Rotate": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "Scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        },
+                        "UniformScale": 1.0
+                    }
+                }
+            ],
+            "Children": []
+        },
+        {
+            "Type": "nap::Entity",
+            "mID": "OakCameraEntity",
+            "Components": [
+                {
+                    "Type": "nap::RenderOakCameraComponent",
+                    "mID": "nap::RenderOakCameraComponent_f36e41e2",
+                    "Visible": true,
+                    "OAK frame": "OakFrameRender",
+                    "Rendering Texture": "OakRenderTexture"
+                },
+                {
+                    "Type": "nap::TransformComponent",
+                    "mID": "nap::TransformComponent_97a873c4",
+                    "Properties": {
+                        "Translate": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "Rotate": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "Scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        },
+                        "UniformScale": 1.0
+                    }
+                }
+            ],
+            "Children": []
+        },
+        {
+            "Type": "nap::Entity",
+            "mID": "OrthoCamEntity",
+            "Components": [
+                {
+                    "Type": "nap::OrthoCameraComponent",
+                    "mID": "nap::OrthoCameraComponent_da5746ad",
+                    "Properties": {
+                        "Mode": "PixelSpace",
+                        "LeftPlane": 0.0,
+                        "RightPlane": 100.0,
+                        "TopPlane": 100.0,
+                        "BottomPlane": 0.0,
+                        "NearClippingPlane": 0.10000000149011612,
+                        "FarClippingPlane": 10000.0
+                    }
+                },
+                {
+                    "Type": "nap::TransformComponent",
+                    "mID": "nap::TransformComponent_8111e008",
+                    "Properties": {
+                        "Translate": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 1.0
+                        },
+                        "Rotate": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "Scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        },
+                        "UniformScale": 1.0
+                    }
+                }
+            ],
+            "Children": []
+        },
+        {
+            "Type": "nap::Entity",
+            "mID": "SemanticSegmentationEntity",
+            "Components": [
+                {
+                    "Type": "nap::SemanticSegComponent",
+                    "mID": "nap::SemanticSegComponent_d3c8a8fb",
+                    "color Cam Node": "ColorCameraNode_4e22ea5d",
+                    "Neural Network Node": "NeuralNetworkNode_18755248",
+                    "OAK frame": "OakFrameRender"
+                }
+            ],
+            "Children": []
+        },
+        {
+            "Type": "nap::Material",
+            "mID": "BackGroundMaterial",
+            "Uniforms": [],
+            "Samplers": [
+                {
+                    "Type": "nap::Sampler2D",
+                    "mID": "Sampler2D_2691df80",
+                    "Name": "textureOAK",
+                    "MinFilter": "Linear",
+                    "MaxFilter": "Linear",
+                    "MipMapMode": "Linear",
+                    "AddressModeVertical": "ClampToEdge",
+                    "AddressModeHorizontal": "ClampToEdge",
+                    "MaxLodLevel": 1000,
+                    "AnisotropicSamples": "Default",
+                    "Texture": "OakRenderTexture"
+                }
+            ],
+            "Buffers": [],
+            "Shader": "MaterialShader",
+            "VertexAttributeBindings": [
+                {
+                    "MeshAttributeID": "Position",
+                    "ShaderAttributeID": "in_Position"
+                },
+                {
+                    "MeshAttributeID": "UV0",
+                    "ShaderAttributeID": "in_UV0"
+                }
+            ],
+            "BlendMode": "Opaque",
+            "DepthMode": "InheritFromBlendMode"
+        },
+        {
+            "Type": "nap::NeuralNetworkNode",
+            "mID": "NeuralNetworkNode_18755248",
+            "Neural Network Path": "C:/Users/pierr/Documents/DEV/NAP/NAP-0.5.0-Win64-x86_64/user_modules/mod_depthaicore/data/nn/deeplabv3p_person_6_shaves.blob",
+            "inference Thread": 2,
+            "blocking": false
+        },
+        {
+            "Type": "nap::OakFrameRender",
+            "mID": "OakFrameRender",
+            "node Type": "ColorCamera"
+        },
+        {
+            "Type": "nap::PlaneMesh",
+            "mID": "BackgroundMesh",
+            "Usage": "DynamicWrite",
+            "CullMode": "None",
+            "PolygonMode": "Fill",
+            "Size": {
+                "x": 1.0,
+                "y": 1.0
+            },
+            "Position": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "Color": {
+                "Values": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "Rows": 1,
+            "Columns": 1
+        },
+        {
+            "Type": "nap::RenderTexture2D",
+            "mID": "OakRenderTexture",
+            "Usage": "DynamicWrite",
+            "Width": 1920,
+            "Height": 1080,
+            "Format": "RGBA8",
+            "ColorSpace": "Linear",
+            "ClearColor": {
+                "Values": [
+                    0.10980392247438431,
+                    0.1411764770746231,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "Type": "nap::RenderWindow",
+            "mID": "Window",
+            "Borderless": false,
+            "Resizable": true,
+            "Visible": true,
+            "SampleShading": true,
+            "Title": "DepthaiTest",
+            "Width": 1280,
+            "Height": 720,
+            "Mode": "Immediate",
+            "ClearColor": {
+                "Values": [
+                    0.06700000166893006,
+                    0.07800000160932541,
+                    0.14900000393390656,
+                    1.0
+                ]
+            },
+            "Samples": "Four",
+            "AdditionalSwapImages": 1
+        },
+        {
+            "Type": "nap::Scene",
+            "mID": "Scene",
+            "Entities": [
+                {
+                    "Entity": "OrthoCamEntity",
+                    "InstanceProperties": []
+                },
+                {
+                    "Entity": "BackgroundEntity",
+                    "InstanceProperties": []
+                },
+                {
+                    "Entity": "OakCameraEntity",
+                    "InstanceProperties": []
+                },
+                {
+                    "Entity": "SemanticSegmentationEntity",
+                    "InstanceProperties": []
+                }
+            ]
+        },
+        {
+            "Type": "nap::ShaderFromFile",
+            "mID": "MaterialShader",
+            "VertShader": "shaders/background.vert",
+            "FragShader": "shaders/background.frag"
+        }
+    ]
+}
