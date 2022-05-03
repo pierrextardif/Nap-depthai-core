@@ -73,10 +73,3 @@ Once opened, find the NeuralNetwork Node and make sure that its path points to t
 <br>
 
 Save it, the run executable.
-
-
-## Known Issues
-
-<br>
-
-[Cmake copy](./mod_depthaicore/module_extra.cmake) isn't working yet, so you will have to copy the openCV dll (`opencv_world455d.dll` / `opencv_world455.dll`) manually into the `bin/Debug` / `bin/Release` folder.
