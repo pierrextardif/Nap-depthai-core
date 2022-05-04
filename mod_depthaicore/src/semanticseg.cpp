@@ -54,14 +54,10 @@ namespace nap
         pipeline->setOpenVINOVersion(dai::OpenVINO::VERSION_2021_4);
 
         // Define source and output
-        //auto xin = pipeline->create<dai::node::XLinkIn>();
-        //auto xoutPreview = pipeline->create<dai::node::XLinkOut>();
         auto xoutRgb = pipeline->create<dai::node::XLinkOut>();
         auto nnOut = pipeline->create<dai::node::XLinkOut>();
 
-        //xoutPreview->setStreamName("previewNN");
         xoutRgb->setStreamName("rgb");
-        //xin->setStreamName("nn_in");
         nnOut->setStreamName("segmentation");
 
 
@@ -83,10 +79,6 @@ namespace nap
         cropManip->setMaxOutputFrameSize(camRgbNode->getCam()->getPreviewHeight() * camRgbNode->getCam()->getPreviewWidth() * 3);
 
 
-        //xin->setMaxDataSize(300 * 300 * 3);
-        //xin->setNumFrames(30);
-
-
         // Linking
         camRgbNode->getCam()->preview.link(cropManip->inputImage);
         cropManip->out.link(resizeManip->inputImage);
@@ -94,10 +86,6 @@ namespace nap
 
         //camera to screen
         camRgbNode->getCam()->preview.link(xoutRgb->input);
-        //detectionNNNode->getNN()->passthrough.link(xoutPreview->input);
-
-        //xin->out.link(detectionNNNode->getNN()->input);
-
         // segmantation to Screen
         detectionNNNode->getNN()->out.link(nnOut->input);
 
@@ -114,8 +102,6 @@ namespace nap
 
         if (qCam) {
 
-
-            //std::shared_ptr<dai::ImgFrame> inPreview = qRgb->tryGet<dai::ImgFrame>();
             std::shared_ptr<dai::ImgFrame> inRgb = qCam->tryGet<dai::ImgFrame>();
             std::shared_ptr<dai::NNData> inDet = qNN->tryGet<dai::NNData>();
 
@@ -141,23 +127,4 @@ namespace nap
         }
 
     }
-
-    // from utilities of depthai-core/examples/utilities
-    void SemanticSegComponentInstance::toPlanar(cv::Mat& bgr, std::vector<std::uint8_t>& data) {
-
-        data.resize(bgr.cols * bgr.rows * 3);
-        for (int y = 0; y < bgr.rows; y++) {
-            for (int x = 0; x < bgr.cols; x++) {
-                auto p = bgr.at<cv::Vec3b>(y, x);
-                data[x + y * bgr.cols + 0 * bgr.rows * bgr.cols] = p[0];
-                data[x + y * bgr.cols + 1 * bgr.rows * bgr.cols] = p[1];
-                data[x + y * bgr.cols + 2 * bgr.rows * bgr.cols] = p[2];
-            }
-        }
-
-        // first pass done 
-        tensorData = true;
-    }
-
-
 }
