@@ -43,6 +43,7 @@ namespace nap
 
 		void updateSSMainTex(cv::Mat* colorFrame);
 		void updateSSMaskTex(std::shared_ptr<dai::NNData> inDet);
+		void updatePreview(cv::Mat* previewFrame);
 
 		DepthAICoreService& getService(); 
 

@@ -58,6 +58,7 @@ namespace nap
 
 		OakCamRenderer = &mOakCameraEntity->getComponent < RenderOakCameraComponentInstance >();
 
+
 		// All done!
 		return true;
 	}

@@ -71,14 +71,14 @@ float remap(float xIn, vec2 scale1, vec2 scale2)
 out vec4 out_Color;
 void main() 
 {
-	vec3 originalColors = texture(colorTexture,vec2(pass_Uvs.x, 1.0 - pass_Uvs.y)).rgb;
-	
-	
 	vec2 c = vec2(pass_Uvs.x, 1.0 - pass_Uvs.y);
+	vec3 originalColors = texture(colorTexture, c).rgb;
+	
+	
 	float human = 1.0;
-	if(pass_Uvs.x >= ucropFrag.cropResize.x && pass_Uvs.x <= ucropFrag.cropResize.y){
-		vec2 coords = vec2(remap(pass_Uvs.x, ucropFrag.cropResize, vec2(0., 1.)) , c.y);
-		human = texture(semanticSegTexture,coords).r * 255.;
+	if(c.x >= ucropFrag.cropResize.x && c.x <= ucropFrag.cropResize.y){
+		vec2 coords = vec2(remap(c.x, ucropFrag.cropResize, vec2(0., 1.)) , c.y);
+		human = texture(semanticSegTexture, coords).r * 255.;
 	}
 
 	out_Color = vec4(originalColors * human, 1.0);

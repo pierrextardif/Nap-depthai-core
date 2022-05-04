@@ -62,6 +62,15 @@ namespace nap
         }
     }
 
+
+
+    void OakFrameRender::updatePreview(cv::Mat* previewFrame)
+    {
+        cv::Mat* colMatTest = new cv::Mat(256, 256, CV_8UC4);
+        cv::cvtColor(*previewFrame, *colMatTest, cv::COLOR_RGB2RGBA);
+        texSegmentation->update((uint8_t*)colMatTest->data, segmentationSurfaceDescriptor);
+    }
+
     bool OakFrameRender::texturesInitDone() {
 
         return texturesCreated;
@@ -155,7 +164,6 @@ namespace nap
         return offsetCrop;
     }
 
-    // helper 
     void OakFrameRender::checkCvMatType(cv::Mat texColor) {
         int inttype = texColor.type();
 
