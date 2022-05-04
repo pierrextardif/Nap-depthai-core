@@ -81,7 +81,7 @@ void main()
 		human = texture(semanticSegTexture,coords).r * 255.;
 	}
 
-	out_Color = vec4(originalColors * .5 + originalColors * human * .5, 1.0);
+	out_Color = vec4(originalColors * human, 1.0);
 
 })glslang";
 

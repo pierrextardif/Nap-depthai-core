@@ -41,8 +41,6 @@ namespace nap
 		glm::vec2 getOakFrameSize();
 		glm::vec2 getCropOffset();
 
-		void toPlanar(cv::Mat& bgr, std::vector<std::uint8_t>& data);
-		void updateSamticSeg(cv::Mat* previewFrame, cv::Mat* colorFrame, std::shared_ptr<dai::RawBuffer> tensor, std::shared_ptr<dai::NNData> inDet);
 		void updateSSMainTex(cv::Mat* colorFrame);
 		void updateSSMaskTex(std::shared_ptr<dai::NNData> inDet);
 
@@ -66,7 +64,6 @@ namespace nap
 		void clearTexture();
 
 		bool texturesCreated;
-		bool tensorData;
 		glm::vec2 frameSize;
 		glm::vec2 offsetCrop;
 

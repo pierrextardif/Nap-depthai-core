@@ -22,7 +22,6 @@ namespace nap
         mService(service) {
 
         texturesCreated = false;
-        tensorData = false;
     }
 
     bool OakFrameRender::start(utility::ErrorState& errorState) {
@@ -42,22 +41,6 @@ namespace nap
     bool OakFrameRender::init() {
         return true;
     }
-    // from utilities of depthai-core/examples/utilities
-    void OakFrameRender::toPlanar(cv::Mat& bgr, std::vector<std::uint8_t>& data) {
-
-        data.resize(bgr.cols * bgr.rows * 3);
-        for (int y = 0; y < bgr.rows; y++) {
-            for (int x = 0; x < bgr.cols; x++) {
-                auto p = bgr.at<cv::Vec3b>(y, x);
-                data[x + y * bgr.cols + 0 * bgr.rows * bgr.cols] = p[0];
-                data[x + y * bgr.cols + 1 * bgr.rows * bgr.cols] = p[1];
-                data[x + y * bgr.cols + 2 * bgr.rows * bgr.cols] = p[2];
-            }
-        }
-
-        // first pass done 
-        tensorData = true;
-    }
 
     void OakFrameRender::updateSSMainTex(cv::Mat* colorFrame)
     {
@@ -76,27 +59,6 @@ namespace nap
             if (layer1.size() > 0) {
                 texSegmentation->update((uint8_t*)layer1.data(), segmentationSurfaceDescriptor);
             }
-        }
-    }
-
-    void OakFrameRender::updateSamticSeg(cv::Mat* previewFrame, cv::Mat* colorFrame, std::shared_ptr<dai::RawBuffer> tensor, std::shared_ptr<dai::NNData> inDet)
-    {
-
-        toPlanar(*previewFrame, tensor->data);
-
-        cv::cvtColor(*colorFrame, *rgbaMat, cv::COLOR_RGB2RGBA);
-        texRGBA->update((uint8_t*)rgbaMat->data, rgbaSurfaceDescriptor);
-
-
-        std::vector<dai::TensorInfo> vecAllLayers = inDet->getAllLayers();
-
-        if (vecAllLayers.size() > 0) {
-
-            std::vector<std::int32_t> layer1 = inDet->getLayerInt32(vecAllLayers[0].name);
-            std::vector<float> layer2 = inDet->getLayerFp16(vecAllLayers[0].name);
-            std::vector < uint8_t> layerU = inDet->getFirstLayerUInt8();
-            if (layer1.size() > 0)
-                texSegmentation->update((uint8_t*)layer1.data(), segmentationSurfaceDescriptor);
         }
     }
 
@@ -193,11 +155,7 @@ namespace nap
         return offsetCrop;
     }
 
-    bool OakFrameRender::firstUpdateTensorData()
-    {
-        return tensorData;
-    }
-
+    // helper 
     void OakFrameRender::checkCvMatType(cv::Mat texColor) {
         int inttype = texColor.type();
 

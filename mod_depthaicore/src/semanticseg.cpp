@@ -72,7 +72,7 @@ namespace nap
 
 
         std::tuple <int, int> resVid = camRgbNode->getCam()->getPreviewSize();
-        float ratio = float(std::get<1>(resVid)) / float(std::get<0>(resVid));
+        float ratio = (float(std::get<0>(resVid)) - float(std::get<1>(resVid)) )/ float(std::get<0>(resVid));
 
 
         float ratioXMin = ratio / 2.;
@@ -86,22 +86,20 @@ namespace nap
         xin->setMaxDataSize(300 * 300 * 3);
         xin->setNumFrames(30);
 
+
+        // Linking
         camRgbNode->getCam()->preview.link(cropManip->inputImage);
         cropManip->out.link(resizeManip->inputImage);
         resizeManip->out.link(detectionNNNode->getNN()->input);
 
 
-
+        //camera to screen
         camRgbNode->getCam()->preview.link(xoutRgb->input);
-        //camRgbNode->getCam()->preview.link(detectionNNNode->getNN()->input);
         detectionNNNode->getNN()->passthrough.link(xoutPreview->input);
-
-        // Linking
-        //camRgb->video.link(xoutRGB->input);
-
+        
         xin->out.link(detectionNNNode->getNN()->input);
 
-
+        // segmantation to Screen
         detectionNNNode->getNN()->out.link(nnOut->input);
 
         // Connect to device and start pipeline
@@ -138,24 +136,15 @@ namespace nap
                 if (inPreview) {
                     cv::Mat previewFrame = inPreview->getCvFrame();
                     toPlanar(previewFrame, tensor->data);
-                    if (tensorData)inDataInQueue->send(tensor);
                 }
 
+                if (tensorData)inDataInQueue->send(tensor);
 
                
 
-                if (inDet) {
+               if (inDet) {
                     mOakFrame->updateSSMaskTex(inDet);
-                }
-
-                //if (inPreview && inDet && inRgb && mOakFrame->texturesInitDone()) {
-                
-                //if(tensorData)inDataInQueue->send(tensor);
-
-                ////if(mOakFrame->firstUpdateTensorData())inDataInQueue->send(tensor);
-                //cv::Mat previewFrame = inPreview->getCvFrame();
-
-                //mOakFrame->updateSamticSeg(&previewFrame, &colorFrame, tensor, inDet);
+               }
                 
 
             }
@@ -169,6 +158,7 @@ namespace nap
 
     }
 
+    // from utilities of depthai-core/examples/utilities
     void SemanticSegComponentInstance::toPlanar(cv::Mat& bgr, std::vector<std::uint8_t>& data) {
 
         data.resize(bgr.cols * bgr.rows * 3);
