@@ -1,8 +1,8 @@
 # Nap-depthai-core
-[DepthAI-Core](https://github.com/luxonis/depthai-core) [Oak-D Lite](https://docs.luxonis.com/projects/hardware/en/latest/pages/DM9095.html) in [Nap Frameworks](https://www.napframework.com/) (Windows)
+Starting point to use [DepthAI-Core](https://github.com/luxonis/depthai-core) [Oak-D Lite](https://docs.luxonis.com/projects/hardware/en/latest/pages/DM9095.html) in [Nap Frameworks](https://www.napframework.com/) (Windows)
 
 <br>
-
+<br>
 Semantic Segmentation example:
 
 <br>
