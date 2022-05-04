@@ -136,15 +136,18 @@ namespace nap
                 if (inPreview) {
                     cv::Mat previewFrame = inPreview->getCvFrame();
                     toPlanar(previewFrame, tensor->data);
+                    if (tensorData)inDataInQueue->send(tensor);
+
+                    std::shared_ptr<dai::NNData> inDet = qNN->tryGet<dai::NNData>(); 
+                    if (inDet) {
+                        mOakFrame->updateSSMaskTex(inDet);
+                    }
                 }
 
-                if (tensorData)inDataInQueue->send(tensor);
 
                
 
-               if (inDet) {
-                    mOakFrame->updateSSMaskTex(inDet);
-               }
+              
                 
 
             }
