@@ -2,8 +2,11 @@
     "Objects": [
         {
             "Type": "nap::ColorCameraNode",
-            "mID": "ColorCameraNode_4e22ea5d",
-            "preview Size": 256,
+            "mID": "ColorCameraNode_ef515727",
+            "preview Size": {
+                "x": 1920.0,
+                "y": 1080.0
+            },
             "cam board socket": "RGB",
             "sensor resolution": "1080_P",
             "interleaved": false,
@@ -162,7 +165,7 @@
                 {
                     "Type": "nap::SemanticSegComponent",
                     "mID": "nap::SemanticSegComponent_d3c8a8fb",
-                    "color Cam Node": "ColorCameraNode_4e22ea5d",
+                    "color Cam Node": "ColorCameraNode_ef515727",
                     "Neural Network Node": "NeuralNetworkNode_18755248",
                     "OAK frame": "OakFrameRender"
                 }
@@ -212,8 +215,7 @@
         },
         {
             "Type": "nap::OakFrameRender",
-            "mID": "OakFrameRender",
-            "node Type": "ColorCamera"
+            "mID": "OakFrameRender"
         },
         {
             "Type": "nap::PlaneMesh",
@@ -265,8 +267,8 @@
             "Visible": true,
             "SampleShading": true,
             "Title": "DepthaiTest",
-            "Width": 1280,
-            "Height": 720,
+            "Width": 1920,
+            "Height": 1080,
             "Mode": "Immediate",
             "ClearColor": {
                 "Values": [

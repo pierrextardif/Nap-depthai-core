@@ -56,8 +56,7 @@ namespace nap
 		if (!error.check(mOakCameraEntity != nullptr, "unable to find camera holder entity with name: %s", "OakCameraEntity"))
 			return false;
 
-		OakCamRenderer = &mOakCameraEntity->getComponent< RenderOakCameraComponentInstance >();
-
+		OakCamRenderer = &mOakCameraEntity->getComponent < RenderOakCameraComponentInstance >();
 
 		// All done!
 		return true;
@@ -136,7 +135,6 @@ namespace nap
 		// Add event, so it can be forwarded on update
 		mInputService->addEvent(std::move(inputEvent));
 	}
-
 	
 	int DepthaiCoreSemanticSegExampleApp::shutdown()
 	{

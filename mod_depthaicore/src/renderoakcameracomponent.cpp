@@ -230,7 +230,13 @@ namespace nap
 			if (mOakFrame->texturesInitDone()) {
 				mRGBASampler->setTexture(mOakFrame->getRGBATexture());
 				mSemanticSegSampler->setTexture(mOakFrame->getSegmentationTexture());
-				return true;
+
+				auto* croppingUniform = mMaterialInstance.getOrCreateUniform("UBOFrag");
+				UniformVec2Instance* croppingSize = croppingUniform->getOrCreateUniform<UniformVec2Instance>("cropResize");
+				croppingSize->setValue(mOakFrame->getCropOffset());
+				glm::vec2 crop = mOakFrame->getCropOffset();
+
+				return false;
 			}
 			else {
 				return false;

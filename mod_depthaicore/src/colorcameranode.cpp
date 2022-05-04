@@ -62,7 +62,7 @@ namespace nap
 		cam = pipeline->create<dai::node::ColorCamera>();
 		
 		// Properties
-		cam->setPreviewSize(previewSize, previewSize);
+		cam->setPreviewSize(previewSize.x, previewSize.y);
 		cam->setBoardSocket(cameraBoardSocket);
 		cam->setResolution(sensorResolution);
 		cam->setInterleaved(interleaved);

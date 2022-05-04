@@ -30,7 +30,8 @@ namespace nap
 		detectionNNNode = resource->detectionNN.get();
         mOakFrame = resource->mOakFrame.get();
 
-        previewSize = camRgbNode->getPreviewSize();
+        previewSize = { 256, 256 };
+        //camRgbNode->getPreviewSize();
 
         pipeline = detectionNNNode->getPipelinePointer();
         
@@ -54,21 +55,46 @@ namespace nap
 
         // Define source and output
         auto xin = pipeline->create<dai::node::XLinkIn>();
-        auto xoutRGB = pipeline->create<dai::node::XLinkOut>();
+        auto xoutPreview = pipeline->create<dai::node::XLinkOut>();
+        auto xoutRgb = pipeline->create<dai::node::XLinkOut>();
         auto nnOut = pipeline->create<dai::node::XLinkOut>();
 
-
-        xoutRGB->setStreamName("rgb");
+        xoutPreview->setStreamName("previewNN");
+        xoutRgb->setStreamName("rgb");
         xin->setStreamName("nn_in");
         nnOut->setStreamName("segmentation");
 
 
 
+        auto resizeManip = pipeline->create<dai::node::ImageManip>();
+        resizeManip->initialConfig.setResize(previewSize.x, previewSize.y);
+        resizeManip->initialConfig.setFrameType(dai::ImgFrame::Type::BGR888p);
+
+
+        std::tuple <int, int> resVid = camRgbNode->getCam()->getPreviewSize();
+        float ratio = float(std::get<1>(resVid)) / float(std::get<0>(resVid));
+
+
+        float ratioXMin = ratio / 2.;
+        float ratioXMax = 1.0 - ratio / 2.;
+        offsetCrop = { ratioXMin, ratioXMax };
+        auto cropManip = pipeline->create<dai::node::ImageManip>();
+        cropManip->initialConfig.setCropRect(ratioXMin, 0, ratioXMax, 1);
+        cropManip->setMaxOutputFrameSize(camRgbNode->getCam()->getPreviewHeight() * camRgbNode->getCam()->getPreviewWidth() * 3);
+
+
         xin->setMaxDataSize(300 * 300 * 3);
         xin->setNumFrames(30);
 
-        camRgbNode->getCam()->preview.link(detectionNNNode->getNN()->input);
-        detectionNNNode->getNN()->passthrough.link(xoutRGB->input);
+        camRgbNode->getCam()->preview.link(cropManip->inputImage);
+        cropManip->out.link(resizeManip->inputImage);
+        resizeManip->out.link(detectionNNNode->getNN()->input);
+
+
+
+        camRgbNode->getCam()->preview.link(xoutRgb->input);
+        //camRgbNode->getCam()->preview.link(detectionNNNode->getNN()->input);
+        detectionNNNode->getNN()->passthrough.link(xoutPreview->input);
 
         // Linking
         //camRgb->video.link(xoutRGB->input);
@@ -82,39 +108,81 @@ namespace nap
         device = new dai::Device(*pipeline, dai::UsbSpeed::SUPER);
 
 
-        qRgb = device->getOutputQueue("rgb", 4, false);
+        qRgb = device->getOutputQueue("previewNN", 4, false);
         qNN = device->getOutputQueue("segmentation", 4, false);
         inDataInQueue = device->getInputQueue("nn_in");
 
+        qCam = device->getOutputQueue("rgb", 4, false);
+
         tensor = std::make_shared<dai::RawBuffer>();
+        tensorData = false;
 	}
 
     void SemanticSegComponentInstance::update(double deltaTime)
     {
 
-        if (qRgb) {
+        if (qCam) {
 
 
-            std::shared_ptr<dai::ImgFrame> inRgb = qRgb->tryGet<dai::ImgFrame>();
+            std::shared_ptr<dai::ImgFrame> inPreview = qRgb->tryGet<dai::ImgFrame>();
             std::shared_ptr<dai::NNData> inDet = qNN->tryGet<dai::NNData>();
+            std::shared_ptr<dai::ImgFrame> inRgb = qCam->tryGet<dai::ImgFrame>();
+
+            if( mOakFrame->texturesInitDone()){
+
+                if (inRgb) {
+                    cv::Mat colorFrame = inRgb->getCvFrame();
+                    mOakFrame->updateSSMainTex(&colorFrame);
+                }
+
+                if (inPreview) {
+                    cv::Mat previewFrame = inPreview->getCvFrame();
+                    toPlanar(previewFrame, tensor->data);
+                    if (tensorData)inDataInQueue->send(tensor);
+                }
 
 
-            if (inRgb && inDet && mOakFrame->texturesInitDone()) {
+               
+
+                if (inDet) {
+                    mOakFrame->updateSSMaskTex(inDet);
+                }
+
+                //if (inPreview && inDet && inRgb && mOakFrame->texturesInitDone()) {
                 
-                if(mOakFrame->firstUpdateTensorData())inDataInQueue->send(tensor);
-                cv::Mat frame = inRgb->getCvFrame();
+                //if(tensorData)inDataInQueue->send(tensor);
 
-                mOakFrame->updateSamticSeg(&frame, tensor, inDet);
+                ////if(mOakFrame->firstUpdateTensorData())inDataInQueue->send(tensor);
+                //cv::Mat previewFrame = inPreview->getCvFrame();
+
+                //mOakFrame->updateSamticSeg(&previewFrame, &colorFrame, tensor, inDet);
+                
 
             }
             else 
             {
                 if (inRgb && inRgb->getWidth() != 0 && inRgb->getHeight() != 0) {
-                    mOakFrame->initTextures(glm::vec2( inRgb->getWidth(), inRgb->getHeight() ), previewSize);
+                    mOakFrame->initTextures(glm::vec2( inRgb->getWidth(), inRgb->getHeight() ), offsetCrop, previewSize);
                 }
             }
         }
 
+    }
+
+    void SemanticSegComponentInstance::toPlanar(cv::Mat& bgr, std::vector<std::uint8_t>& data) {
+
+        data.resize(bgr.cols * bgr.rows * 3);
+        for (int y = 0; y < bgr.rows; y++) {
+            for (int x = 0; x < bgr.cols; x++) {
+                auto p = bgr.at<cv::Vec3b>(y, x);
+                data[x + y * bgr.cols + 0 * bgr.rows * bgr.cols] = p[0];
+                data[x + y * bgr.cols + 1 * bgr.rows * bgr.cols] = p[1];
+                data[x + y * bgr.cols + 2 * bgr.rows * bgr.cols] = p[2];
+            }
+        }
+
+        // first pass done 
+        tensorData = true;
     }
 
 

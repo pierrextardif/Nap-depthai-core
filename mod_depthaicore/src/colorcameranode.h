@@ -35,7 +35,7 @@ namespace nap
 
 		void update(double deltaTime);
 
-		int previewSize = 256;
+		glm::vec2 previewSize = { 1920, 1080 };
 		dai::CameraBoardSocket cameraBoardSocket = dai::CameraBoardSocket::RGB;
 		dai::ColorCameraProperties::SensorResolution sensorResolution = dai::ColorCameraProperties::SensorResolution::THE_1080_P;
 		bool interleaved = false;

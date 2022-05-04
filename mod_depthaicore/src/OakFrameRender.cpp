@@ -59,16 +59,37 @@ namespace nap
         tensorData = true;
     }
 
-    void OakFrameRender::updateSamticSeg(cv::Mat* frame, std::shared_ptr<dai::RawBuffer> tensor, std::shared_ptr<dai::NNData> inDet)
+    void OakFrameRender::updateSSMainTex(cv::Mat* colorFrame)
+    {
+        cv::cvtColor(*colorFrame, *rgbaMat, cv::COLOR_RGB2RGBA);
+        texRGBA->update((uint8_t*)rgbaMat->data, rgbaSurfaceDescriptor);
+
+    }
+
+    void OakFrameRender::updateSSMaskTex(std::shared_ptr<dai::NNData> inDet)
+    {
+        std::vector<dai::TensorInfo> vecAllLayers = inDet->getAllLayers();
+
+        if (vecAllLayers.size() > 0) {
+
+            std::vector<std::int32_t> layer1 = inDet->getLayerInt32(vecAllLayers[0].name);
+            if (layer1.size() > 0) {
+                texSegmentation->update((uint8_t*)layer1.data(), segmentationSurfaceDescriptor);
+            }
+        }
+    }
+
+    void OakFrameRender::updateSamticSeg(cv::Mat* previewFrame, cv::Mat* colorFrame, std::shared_ptr<dai::RawBuffer> tensor, std::shared_ptr<dai::NNData> inDet)
     {
 
-        toPlanar(*frame, tensor->data);
+        toPlanar(*previewFrame, tensor->data);
 
-        cv::cvtColor(*frame, *rgbaMat, cv::COLOR_RGB2RGBA);
+        cv::cvtColor(*colorFrame, *rgbaMat, cv::COLOR_RGB2RGBA);
         texRGBA->update((uint8_t*)rgbaMat->data, rgbaSurfaceDescriptor);
 
 
         std::vector<dai::TensorInfo> vecAllLayers = inDet->getAllLayers();
+
         if (vecAllLayers.size() > 0) {
 
             std::vector<std::int32_t> layer1 = inDet->getLayerInt32(vecAllLayers[0].name);
@@ -85,12 +106,12 @@ namespace nap
     }
 
 
-    void OakFrameRender::initTextures(glm::vec2 imgFrame, glm::vec2 sizeFrameNN)
+    void OakFrameRender::initTextures(glm::vec2 imgFrame, glm::vec2 offsetCrop, glm::vec2 sizeFrameNN)
     {
-        texturesCreated = initTexture(imgFrame, sizeFrameNN);
+        texturesCreated = initTexture(imgFrame, offsetCrop, sizeFrameNN);
     }
 
-    bool OakFrameRender::initTexture(glm::vec2 imgFrame, glm::vec2 sizeFrameNN)
+    bool OakFrameRender::initTexture(glm::vec2 imgFrame, glm::vec2 offsetCropNN, glm::vec2 sizeFrameNN)
     {
         if (texturesCreated) {
             return texturesCreated;
@@ -129,7 +150,9 @@ namespace nap
 
             clearTexture();
 
-            texturesCreated = true;
+            offsetCrop = offsetCropNN;
+
+            return true;
 
         }
     }
@@ -157,13 +180,17 @@ namespace nap
 
     nap::Texture2D& OakFrameRender::getSegmentationTexture() {
 
-        NAP_ASSERT_MSG(texSegmentation != nullptr, "Missing video RGBA texture");
+        NAP_ASSERT_MSG(texSegmentation != nullptr, "Missing video segmentation texture");
         return *texSegmentation;
     }
 
     glm::vec2 OakFrameRender::getOakFrameSize() {
 
         return frameSize;
+    }
+
+    glm::vec2 OakFrameRender::getCropOffset() {
+        return offsetCrop;
     }
 
     bool OakFrameRender::firstUpdateTensorData()

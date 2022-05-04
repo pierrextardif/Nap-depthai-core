@@ -50,10 +50,15 @@ namespace nap
 
 
 		std::shared_ptr<dai::DataOutputQueue>		qRgb = nullptr;
+		std::shared_ptr<dai::DataOutputQueue>		qCam = nullptr;
 		std::shared_ptr<dai::DataOutputQueue>		qNN = nullptr;
 		std::shared_ptr<dai::DataInputQueue>		inDataInQueue = nullptr;
 		std::shared_ptr<dai::RawBuffer>				tensor = nullptr;
 
+
+		bool tensorData;
+		void toPlanar(cv::Mat& bgr, std::vector<std::uint8_t>& data);
+		glm::vec2 offsetCrop;
 		glm::vec2 previewSize;
 		ColorCameraNode* camRgbNode = nullptr;
 		NeuralNetworkNode* detectionNNNode = nullptr;
