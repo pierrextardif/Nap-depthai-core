@@ -3,9 +3,10 @@ include(${NAP_ROOT}/cmake/dist_shared_crossplatform.cmake)
 
 set(OpenCV_DIR "C:/dev/opencv/opencv/build")
 set(depthai_DIR "C:/Users/pierr/Documents/DEV/DEPTHAI_DEV/build_2")
-find_package(OpenCV REQUIRED)
 
+find_package(OpenCV REQUIRED)
 find_package(depthai CONFIG REQUIRED)
+
 target_link_libraries(${PROJECT_NAME} depthai::opencv ${OpenCV_LIBS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${depthai_DIR}/include)

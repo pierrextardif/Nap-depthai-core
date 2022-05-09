@@ -29,6 +29,7 @@ namespace nap
 		ResourcePtr < ColorCameraNode >		camRgb;
 		ResourcePtr < NeuralNetworkNode >	detectionNN;
 		ResourcePtr < OakFrameRender >		mOakFrame;
+		bool backgroundOutsideCropping;
 	};
 
 	class NAPAPI SemanticSegComponentInstance : public ComponentInstance
@@ -55,6 +56,7 @@ namespace nap
 
 		glm::vec2 offsetCrop;
 		glm::vec2 previewSize;
+		bool croppingOutterBackground = false;
 		ColorCameraNode* camRgbNode = nullptr;
 		NeuralNetworkNode* detectionNNNode = nullptr;
 		OakFrameRender* mOakFrame = nullptr;

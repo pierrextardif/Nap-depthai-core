@@ -11,6 +11,7 @@ RTTI_BEGIN_CLASS_NO_DEFAULT_CONSTRUCTOR(nap::NeuralNetworkNode)
 RTTI_PROPERTY_FILELINK("Neural Network Path", &nap::NeuralNetworkNode::nnPath, nap::rtti::EPropertyMetaData::Required, nap::rtti::EPropertyFileType::Any)
 RTTI_PROPERTY("inference Thread", &nap::NeuralNetworkNode::inferenceThreads, nap::rtti::EPropertyMetaData::Required);
 RTTI_PROPERTY("blocking", &nap::NeuralNetworkNode::blocking, nap::rtti::EPropertyMetaData::Required);
+RTTI_PROPERTY("size of Neural Network Input", &nap::NeuralNetworkNode::sizeNN, nap::rtti::EPropertyMetaData::Required);
 RTTI_END_CLASS
 
 //////////////////////////////////////////////////////////////////////////
@@ -55,5 +56,10 @@ namespace nap
 	void NeuralNetworkNode::stop()
 	{
 
+	}
+
+	glm::vec2 NeuralNetworkNode::getSizeNN()
+	{
+		return sizeNN;
 	}
 }

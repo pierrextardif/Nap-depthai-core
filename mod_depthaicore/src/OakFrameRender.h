@@ -34,12 +34,13 @@ namespace nap
 		Texture2D& getSegmentationTexture();
 
 
-		void initTextures(glm::vec2 imgFrame, glm::vec2 offsetCrop, glm::vec2 sizeFrameNN = { -1, -1 });
+		void initTextures(glm::vec2 imgFrame, glm::vec2 offsetCrop, glm::vec2 sizeFrameNN, bool _humanIncropping);
 		bool texturesInitDone();
 		bool firstUpdateTensorData();
 
 		glm::vec2 getOakFrameSize();
 		glm::vec2 getCropOffset();
+		float getOutsideHumanCropping();
 
 		void updateSSMainTex(cv::Mat* colorFrame);
 		void updateSSMaskTex(std::shared_ptr<dai::NNData> inDet);
@@ -56,7 +57,7 @@ namespace nap
 		void updateOakFrame();
 		bool init();
 
-		bool initTexture(glm::vec2 imgFrame, glm::vec2 offsetCropNN, glm::vec2 sizeFrameNN);
+		bool initTexture(glm::vec2 imgFrame, glm::vec2 offsetCropNN, glm::vec2 sizeFrameNN, bool _humanIncropping);
 
 		std::unique_ptr<Texture2D> texRGBA;
 		std::unique_ptr<Texture2D> texSegmentation;
@@ -67,6 +68,7 @@ namespace nap
 		bool texturesCreated;
 		glm::vec2 frameSize;
 		glm::vec2 offsetCrop;
+		bool croppingOutsideHumanFrame;
 
 
 		cv::Mat* rgbaMat;

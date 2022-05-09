@@ -58,6 +58,7 @@ in vec3 pass_Uvs;
 uniform UBOFrag
 {
 	uniform vec2 	cropResize;
+	uniform float	humanOutsideCrop;
 } ucropFrag;
 
 
@@ -75,7 +76,7 @@ void main()
 	vec3 originalColors = texture(colorTexture, c).rgb;
 	
 	
-	float human = 1.0;
+	float human = humanOutsideCrop;
 	if(c.x >= ucropFrag.cropResize.x && c.x <= ucropFrag.cropResize.y){
 		vec2 coords = vec2(remap(c.x, ucropFrag.cropResize, vec2(0., 1.)) , c.y);
 		human = texture(semanticSegTexture, coords).r * 255.;

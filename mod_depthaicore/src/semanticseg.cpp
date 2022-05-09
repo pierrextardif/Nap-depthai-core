@@ -9,6 +9,7 @@ RTTI_BEGIN_CLASS(nap::SemanticSegComponent)
 RTTI_PROPERTY("color Cam Node", &nap::SemanticSegComponent::camRgb, nap::rtti::EPropertyMetaData::Required);
 RTTI_PROPERTY("Neural Network Node", &nap::SemanticSegComponent::detectionNN, nap::rtti::EPropertyMetaData::Required);
 RTTI_PROPERTY("OAK frame", &nap::SemanticSegComponent::mOakFrame, nap::rtti::EPropertyMetaData::Required);
+RTTI_PROPERTY("bckgrnd Outside Cropping", &nap::SemanticSegComponent::backgroundOutsideCropping, nap::rtti::EPropertyMetaData::Required);
 RTTI_END_CLASS
 
 
@@ -30,8 +31,9 @@ namespace nap
         detectionNNNode = resource->detectionNN.get();
         mOakFrame = resource->mOakFrame.get();
 
-        previewSize = { 256, 256 };
-        //camRgbNode->getPreviewSize();
+        previewSize = detectionNNNode->getSizeNN();
+
+        croppingOutterBackground = resource->backgroundOutsideCropping;
 
         pipeline = detectionNNNode->getPipelinePointer();
 
@@ -121,7 +123,7 @@ namespace nap
             else
             {
                 if (inRgb && inRgb->getWidth() != 0 && inRgb->getHeight() != 0) {
-                    mOakFrame->initTextures(glm::vec2(inRgb->getWidth(), inRgb->getHeight()), offsetCrop, previewSize);
+                    mOakFrame->initTextures(glm::vec2(inRgb->getWidth(), inRgb->getHeight()), offsetCrop, previewSize, croppingOutterBackground);
                 }
             }
         }

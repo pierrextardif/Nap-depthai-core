@@ -77,12 +77,12 @@ namespace nap
     }
 
 
-    void OakFrameRender::initTextures(glm::vec2 imgFrame, glm::vec2 offsetCrop, glm::vec2 sizeFrameNN)
+    void OakFrameRender::initTextures(glm::vec2 imgFrame, glm::vec2 offsetCrop, glm::vec2 sizeFrameNN, bool _humanIncropping)
     {
-        texturesCreated = initTexture(imgFrame, offsetCrop, sizeFrameNN);
+        texturesCreated = initTexture(imgFrame, offsetCrop, sizeFrameNN, _humanIncropping);
     }
 
-    bool OakFrameRender::initTexture(glm::vec2 imgFrame, glm::vec2 offsetCropNN, glm::vec2 sizeFrameNN)
+    bool OakFrameRender::initTexture(glm::vec2 imgFrame, glm::vec2 offsetCropNN, glm::vec2 sizeFrameNN, bool _humanIncropping)
     {
         if (texturesCreated) {
             return texturesCreated;
@@ -122,6 +122,7 @@ namespace nap
             clearTexture();
 
             offsetCrop = offsetCropNN;
+            croppingOutsideHumanFrame = _humanIncropping;
 
             return true;
 
@@ -162,6 +163,11 @@ namespace nap
 
     glm::vec2 OakFrameRender::getCropOffset() {
         return offsetCrop;
+    }
+
+    float OakFrameRender::getOutsideHumanCropping()
+    {
+        return croppingOutsideHumanFrame ? 1.0 : 0.;
     }
 
     void OakFrameRender::checkCvMatType(cv::Mat texColor) {

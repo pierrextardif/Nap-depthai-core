@@ -234,9 +234,11 @@ namespace nap
 				auto* croppingUniform = mMaterialInstance.getOrCreateUniform("UBOFrag");
 				UniformVec2Instance* croppingSize = croppingUniform->getOrCreateUniform<UniformVec2Instance>("cropResize");
 				croppingSize->setValue(mOakFrame->getCropOffset());
-				glm::vec2 crop = mOakFrame->getCropOffset();
 
-				return false;
+				UniformFloatInstance* humanInCropping = croppingUniform->getOrCreateUniform<UniformFloatInstance>("humanOutsideCrop");
+				humanInCropping->setValue(mOakFrame->getOutsideHumanCropping());
+
+				return true;
 			}
 			else {
 				return false;
