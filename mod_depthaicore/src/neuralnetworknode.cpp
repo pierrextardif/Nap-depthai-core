@@ -31,7 +31,11 @@ namespace nap
 
 		return true;
 	}
-
+	
+	DepthAICoreService& NeuralNetworkNode::getDepthAICoreService()
+	{
+		return mService;
+	}
 
 	void NeuralNetworkNode::initNN()
 	{

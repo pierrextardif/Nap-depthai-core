@@ -6,9 +6,9 @@
 
 
 RTTI_BEGIN_CLASS(nap::SemanticSegComponent)
-RTTI_PROPERTY("color Cam Node", &nap::SemanticSegComponent::camRgb, nap::rtti::EPropertyMetaData::Required);
-RTTI_PROPERTY("Neural Network Node", &nap::SemanticSegComponent::detectionNN, nap::rtti::EPropertyMetaData::Required);
-RTTI_PROPERTY("OAK frame", &nap::SemanticSegComponent::mOakFrame, nap::rtti::EPropertyMetaData::Required);
+RTTI_PROPERTY("color Cam Node", &nap::SemanticSegComponent::camRgbRsrcePtr, nap::rtti::EPropertyMetaData::Required);
+RTTI_PROPERTY("Neural Network Node", &nap::SemanticSegComponent::detectionNNRsrcePtr, nap::rtti::EPropertyMetaData::Required);
+RTTI_PROPERTY("Frame Render Node", &nap::SemanticSegComponent::frameRenderRsrcePtr, nap::rtti::EPropertyMetaData::Required);
 RTTI_PROPERTY("bckgrnd Outside Cropping", &nap::SemanticSegComponent::backgroundOutsideCropping, nap::rtti::EPropertyMetaData::Required);
 RTTI_END_CLASS
 
@@ -27,13 +27,13 @@ namespace nap
     bool SemanticSegComponentInstance::init(utility::ErrorState& errorState)
     {
         nap::SemanticSegComponent* resource = getComponent<nap::SemanticSegComponent>();
-        camRgbNode = resource->camRgb.get();
-        detectionNNNode = resource->detectionNN.get();
-        mOakFrame = resource->mOakFrame.get();
+        camRgbNode = resource->camRgbRsrcePtr.get();
+        detectionNNNode = resource->detectionNNRsrcePtr.get();
+        mSemanticSegFrame = resource->frameRenderRsrcePtr.get();
 
         previewSize = detectionNNNode->getSizeNN();
 
-        croppingOutterBackground = resource->backgroundOutsideCropping;
+        substractOutterBackground = resource->backgroundOutsideCropping;
 
         pipeline = detectionNNNode->getPipelinePointer();
 
@@ -107,15 +107,15 @@ namespace nap
             std::shared_ptr<dai::ImgFrame> inRgb = qCam->tryGet<dai::ImgFrame>();
             std::shared_ptr<dai::NNData> inDet = qNN->tryGet<dai::NNData>();
 
-            if (mOakFrame->texturesInitDone()) {
+            if (mSemanticSegFrame->texturesInitDone()) {
 
                 if (inRgb) {
                     cv::Mat colorFrame = inRgb->getCvFrame();
-                    mOakFrame->updateSSMainTex(&colorFrame);
+                    mSemanticSegFrame->updateSSMainTex(&colorFrame);
                 }
 
                 if (inDet) {
-                    mOakFrame->updateSSMaskTex(inDet);
+                    mSemanticSegFrame->updateSSMaskTex(inDet);
                 }
 
 
@@ -123,7 +123,7 @@ namespace nap
             else
             {
                 if (inRgb && inRgb->getWidth() != 0 && inRgb->getHeight() != 0) {
-                    mOakFrame->initTextures(glm::vec2(inRgb->getWidth(), inRgb->getHeight()), offsetCrop, previewSize, croppingOutterBackground);
+                    mSemanticSegFrame->initTextures(glm::vec2(inRgb->getWidth(), inRgb->getHeight()), offsetCrop, previewSize, substractOutterBackground);
                 }
             }
         }

@@ -8,7 +8,7 @@
 #include <shader.h>
 
 // Service include
-#include <oakframerender.h>
+#include <semanticsegframerender.h>
 
 namespace nap
 {

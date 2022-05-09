@@ -10,7 +10,7 @@
 #include <materialinstance.h>
 #include <renderablemesh.h>
 
-#include <oakframerender.h>
+#include <semanticsegframerender.h>
 
 namespace nap
 {
@@ -24,7 +24,7 @@ namespace nap
 	public:
 
 		ResourcePtr<RenderTexture2D>	mOutputTexture = nullptr;
-		ResourcePtr<OakFrameRender>		mOakFrame = nullptr;
+		ResourcePtr<SemanticSegFrameRender>		mOakFrame = nullptr;
 		ERasterizationSamples			mRequestedSamples = ERasterizationSamples::One;		///< Property: 'Samples' The number of samples used during Rasterization. For better results enable 'SampleShading'
 		RGBAColor8						mClearColor = { 255, 255, 255, 255 };
 
@@ -40,7 +40,7 @@ namespace nap
 		virtual bool init(utility::ErrorState& errorState) override;
 		virtual bool isSupported(nap::CameraComponentInstance& camera) const override;
 		
-		OakFrameRender* getOakFrameRender() {
+		SemanticSegFrameRender* getSemanticSegFrameRender() {
 			return mOakFrame;
 		}
 
@@ -51,7 +51,7 @@ namespace nap
 		glm::vec2 getOakFrameSize();
 
 	private :
-		OakFrameRender*				mOakFrame = nullptr;
+		SemanticSegFrameRender*				mOakFrame = nullptr;
 		RenderTexture2D*			mOutputTexture = nullptr;						///< Texture currently bound by target
 		RGBColorFloat				mClearColor = { 0.0f, 0.0f, 0.0f };				///< Target Clear Color
 		RenderTarget				mTarget;										///< Target video is rendered into

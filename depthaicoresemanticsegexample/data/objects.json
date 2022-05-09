@@ -2,10 +2,10 @@
     "Objects": [
         {
             "Type": "nap::ColorCameraNode",
-            "mID": "ColorCameraNode_ef515727",
+            "mID": "ColorCameraNode",
             "preview Size": {
                 "x": 1920.0,
-                "y": 1000.0
+                "y": 1080.0
             },
             "cam board socket": "RGB",
             "sensor resolution": "1080_P",
@@ -88,7 +88,7 @@
                     "Type": "nap::RenderOakCameraComponent",
                     "mID": "nap::RenderOakCameraComponent_f36e41e2",
                     "Visible": true,
-                    "OAK frame": "OakFrameRender",
+                    "OAK frame": "SemanticSegFrameRender",
                     "Rendering Texture": "OakRenderTexture"
                 },
                 {
@@ -163,11 +163,34 @@
             "mID": "SemanticSegmentationEntity",
             "Components": [
                 {
+                    "Type": "nap::TransformComponent",
+                    "mID": "nap::TransformComponent_fb501383",
+                    "Properties": {
+                        "Translate": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "Rotate": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "Scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        },
+                        "UniformScale": 1.0
+                    }
+                },
+                {
                     "Type": "nap::SemanticSegComponent",
-                    "mID": "nap::SemanticSegComponent_d3c8a8fb",
-                    "color Cam Node": "ColorCameraNode_ef515727",
-                    "Neural Network Node": "NeuralNetworkNode_18755248",
-                    "OAK frame": "OakFrameRender"
+                    "mID": "nap::SemanticSegComponent_595cf4fe",
+                    "color Cam Node": "ColorCameraNode",
+                    "Neural Network Node": "NeuralNetworkNode",
+                    "Frame Render Node": "SemanticSegFrameRender",
+                    "bckgrnd Outside Cropping": false
                 }
             ],
             "Children": []
@@ -208,14 +231,14 @@
         },
         {
             "Type": "nap::NeuralNetworkNode",
-            "mID": "NeuralNetworkNode_18755248",
+            "mID": "NeuralNetworkNode",
             "Neural Network Path": "C:/Users/pierr/Documents/DEV/NAP/NAP-0.5.0-Win64-x86_64/user_modules/mod_depthaicore/data/nn/deeplabv3p_person_6_shaves.blob",
             "inference Thread": 2,
-            "blocking": false
-        },
-        {
-            "Type": "nap::OakFrameRender",
-            "mID": "OakFrameRender"
+            "blocking": false,
+            "size of Neural Network Input": {
+                "x": 256.0,
+                "y": 256.0
+            }
         },
         {
             "Type": "nap::PlaneMesh",
@@ -266,7 +289,7 @@
             "Resizable": true,
             "Visible": true,
             "SampleShading": true,
-            "Title": "DepthaiTest",
+            "Title": "DepthaiCoreSemanticSegmentation",
             "Width": 1920,
             "Height": 1080,
             "Mode": "Immediate",
@@ -302,6 +325,10 @@
                     "InstanceProperties": []
                 }
             ]
+        },
+        {
+            "Type": "nap::SemanticSegFrameRender",
+            "mID": "SemanticSegFrameRender"
         },
         {
             "Type": "nap::ShaderFromFile",

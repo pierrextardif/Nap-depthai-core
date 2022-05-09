@@ -15,6 +15,7 @@
 RTTI_BEGIN_CLASS(nap::RenderOakCameraComponent)
 RTTI_PROPERTY("OAK frame",				&nap::RenderOakCameraComponent::mOakFrame,			nap::rtti::EPropertyMetaData::Required);
 RTTI_PROPERTY("Rendering Texture",		&nap::RenderOakCameraComponent::mOutputTexture,		nap::rtti::EPropertyMetaData::Required);
+
 RTTI_END_CLASS
 
 RTTI_BEGIN_CLASS_NO_DEFAULT_CONSTRUCTOR(nap::RenderOakCameraComponentInstance)

@@ -76,7 +76,7 @@ void main()
 	vec3 originalColors = texture(colorTexture, c).rgb;
 	
 	
-	float human = humanOutsideCrop;
+	float human = ucropFrag.humanOutsideCrop;
 	if(c.x >= ucropFrag.cropResize.x && c.x <= ucropFrag.cropResize.y){
 		vec2 coords = vec2(remap(c.x, ucropFrag.cropResize, vec2(0., 1.)) , c.y);
 		human = texture(semanticSegTexture, coords).r * 255.;

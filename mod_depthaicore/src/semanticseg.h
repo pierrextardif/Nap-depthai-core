@@ -8,7 +8,7 @@
 #include "depthai/depthai.hpp"
 #include <colorcameranode.h>
 #include <neuralnetworknode.h>
-#include <oakframerender.h>
+#include <semanticsegframerender.h>
 
 using namespace nap;
 
@@ -26,9 +26,9 @@ namespace nap
 
 	public:
 		
-		ResourcePtr < ColorCameraNode >		camRgb;
-		ResourcePtr < NeuralNetworkNode >	detectionNN;
-		ResourcePtr < OakFrameRender >		mOakFrame;
+		ResourcePtr < ColorCameraNode >		camRgbRsrcePtr;
+		ResourcePtr < NeuralNetworkNode >	detectionNNRsrcePtr;
+		ResourcePtr < SemanticSegFrameRender >	frameRenderRsrcePtr;
 		bool backgroundOutsideCropping;
 	};
 
@@ -56,10 +56,10 @@ namespace nap
 
 		glm::vec2 offsetCrop;
 		glm::vec2 previewSize;
-		bool croppingOutterBackground = false;
+		bool substractOutterBackground = false;
 		ColorCameraNode* camRgbNode = nullptr;
 		NeuralNetworkNode* detectionNNNode = nullptr;
-		OakFrameRender* mOakFrame = nullptr;
+		SemanticSegFrameRender* mSemanticSegFrame = nullptr;
 	};
 
 }

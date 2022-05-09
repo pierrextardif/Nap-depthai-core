@@ -1,6 +1,6 @@
 #pragma once
 
-#include <oakframerender.h>
+#include <semanticsegframerender.h>
 #include <colorcameranode.h>
 #include <neuralnetworknode.h>
 
@@ -34,7 +34,7 @@ namespace nap
 
 	class NAPAPI DepthAICoreService : public Service
 	{
-		friend class OakFrameRender;
+		friend class SemanticSegFrameRender;
 		friend class TestFrameRender;
 		RTTI_ENABLE(Service)
 	public:

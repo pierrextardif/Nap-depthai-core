@@ -31,6 +31,7 @@ namespace nap
 		virtual bool start(utility::ErrorState& errorState) override;
 		virtual void stop() override;
 		std::shared_ptr < dai::node::NeuralNetwork> getNN();
+		DepthAICoreService& getDepthAICoreService();
 		std::shared_ptr < dai::Pipeline > getPipelinePointer();
 		glm::vec2 getSizeNN();
 

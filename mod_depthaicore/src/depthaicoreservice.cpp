@@ -41,7 +41,7 @@ namespace nap
 
 	void DepthAICoreService::registerObjectCreators(rtti::Factory& factory)
 	{
-		factory.addObjectCreator(std::make_unique<OakFrameRenderObjectCreator>(*this));
+		factory.addObjectCreator(std::make_unique<SemanticSegFrameRenderObjectCreator>(*this));
 		factory.addObjectCreator(std::make_unique<ColorCameraNodeObjectCreator>(*this));
 		factory.addObjectCreator(std::make_unique<NeuralNetworkNodeObjectCreator>(*this));
 	}
