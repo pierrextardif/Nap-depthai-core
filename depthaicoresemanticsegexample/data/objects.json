@@ -18,7 +18,7 @@
             "Components": [
                 {
                     "Type": "nap::RenderableMeshComponent",
-                    "mID": "nap::RenderableMeshComponent_27c16a0c",
+                    "mID": "nap::RenderableMeshComponent",
                     "Visible": true,
                     "Mesh": "BackgroundMesh",
                     "MaterialInstance": {
