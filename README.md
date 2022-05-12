@@ -2,6 +2,9 @@
 Starting point to use [DepthAI-Core](https://github.com/luxonis/depthai-core) [Oak-D Lite](https://docs.luxonis.com/projects/hardware/en/latest/pages/DM9095.html) in [Nap Frameworks](https://www.napframework.com/) (Windows)
 
 <br>
+
+You can read about it [here](https://medium.com/@pierre.tardif00/nap-framework-semantic-segmentation-using-oak-d-lite-camera-and-feedback-628839e69463).
+
 <br>
 Semantic Segmentation example:
 
